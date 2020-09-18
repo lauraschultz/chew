@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -14,12 +17,14 @@
     "@types/socket.io-client": "^1.4.33",
     "axios": "^0.20.0",
     "history": "^5.0.0",
+    "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "rxjs": "^6.6.3",
     "socket.io-client": "^2.3.0",
+    "tailwind": "^4.0.0",
     "typescript": "^3.7.5"
   },
   "scripts": {

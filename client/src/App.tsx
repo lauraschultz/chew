@@ -1,25 +1,24 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
-import logo from "./logo.svg";
-import "./App.css";
 import Search from "./Search";
 import {
   Switch,
   Route,
-  Router,
   matchPath,
   Redirect,
-  BrowserRouter,
   useHistory,
 } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import Login from "./Login";
-import Main from "./Main";
+import Display from "./Display";
 import { SERVER } from "./config";
 import { BusinessWithVotes, Business } from "./YelpInterfaces";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
 import axios from "axios";
 import io from "socket.io-client";
+import LoginTemplate from "./Templates/LoginTemplate";
+import AppTemplate from "./Templates/AppTemplate";
+import "./comp.css";
+import ModalContainer from "./ModalContainer";
 
 // let history = createBrowserHistory();
 let sessionId: string;
@@ -111,13 +110,15 @@ const App: React.FC = () => {
       console.log(`recieved ${JSON.stringify(params)}`);
       console.log(params.restaurantId);
       console.log(addedRestaurants);
-      setAddedRestaurants(r => ({
+      setAddedRestaurants((r) => ({
         ...r,
         [params.restaurantId]: {
           business: r[params.restaurantId].business,
-          votes: r[params.restaurantId].votes.map((v, idx) => idx===params.vote.level ? params.vote.names : v)
-        }
-      }))
+          votes: r[params.restaurantId].votes.map((v, idx) =>
+            idx === params.vote.level ? params.vote.names : v
+          ),
+        },
+      }));
       // console.log(this);
       // addedRestaurants[params.restaurantId].votes[params.vote.level] =
       //   params.vote.names;
@@ -133,6 +134,11 @@ const App: React.FC = () => {
         restaurants: { [id: string]: BusinessWithVotes };
       }) => {
         if (response.success) {
+          console.log(
+            `recieved from resumeSession response: ${JSON.stringify(
+              response.restaurants
+            )}`
+          );
           setLocalStorage(params.sessionId, userId);
           sessionId = params.sessionId;
           userId = userId;
@@ -232,32 +238,42 @@ const App: React.FC = () => {
     // <Router history={history}>
     // <BrowserRouter>
     <div>
-      {showModal && <Modal />}
+      <ModalContainer show={showModal}>
+        <Modal />
+      </ModalContainer>
       <Switch>
         <Route path="/getStarted">
-          <Login
-            // setSessionId={(id: string) => (sessionId = id)}
-            joinSession={joinSession}
-            newSession={newSession}
-          />
+          <LoginTemplate>
+            <Login
+              // setSessionId={(id: string) => (sessionId = id)}
+              joinSession={joinSession}
+              newSession={newSession}
+            />
+          </LoginTemplate>
         </Route>
         <Route path="/ID/:sessionId" exact>
-          <h2>SESSIONID PATHMATCH</h2>
-          <Main
-            restaurants={addedRestaurants}
-            search={search}
-            addRestaurant={addRestaurant}
-            voteOnRestaurant={voteOnRestaurant}
-            joinSession={joinSession}
-          />
+          <AppTemplate>
+            <Display
+              restaurants={addedRestaurants}
+              voteOnRestaurant={voteOnRestaurant}
+            />
+            <div className="invisible md:visible">
+              <Search
+                search={search}
+                addRestaurant={addRestaurant}
+                voteOnRestaurant={voteOnRestaurant}
+              ></Search>
+            </div>
+          </AppTemplate>
         </Route>
         <Route path="/ID/:sessionId/search" exact>
-          <h2>SESSIONID SEARCH PATHMATCH</h2>
-          <Search
-            search={search}
-            addRestaurant={addRestaurant}
-            voteOnRestaurant={voteOnRestaurant}
-          />
+          <AppTemplate>
+            <Search
+              search={search}
+              addRestaurant={addRestaurant}
+              voteOnRestaurant={voteOnRestaurant}
+            />
+          </AppTemplate>
         </Route>
         <Route path="/" exact>
           <Redirect to="/getStarted" />

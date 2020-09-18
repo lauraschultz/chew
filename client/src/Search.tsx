@@ -41,7 +41,7 @@ const DisplaySearchResults: React.FC<{
               <span key={c.alias}> {c.title}</span>
             ))}
             {displayVoteComponent[b.id] ? (
-              <Vote addVote={(v: number) => {console.log(`search component. vote is ${v} and restId is ${b.id}`);voteOnRestaurant(b.id, v)}} />
+              <Vote currentVote={undefined} addVote={(v: number) => {console.log(`search component. vote is ${v} and restId is ${b.id}`);voteOnRestaurant(b.id, v)}} />
             ) : null}
           </li>
         )}

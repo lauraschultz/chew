@@ -9,6 +9,14 @@ const PORT = process.env.PORT || 4000;
 const activeSessions = {};
 const VOTE_VALUES = 3;
 
+const objExists = (obj) => {
+  console.log(`objExists method: obj is ${JSON.stringify(obj)}`);
+  if (!obj) {
+    return false;
+  }
+  return Object.keys(obj).length > 0;
+};
+
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database(),
   app = express(),
@@ -96,17 +104,19 @@ let resumeSession = ({ sessionId }, callback, socket) => {
   });
 };
 
-let joinSession = ({ sessionId, userName }, callback, socket) => {
+let joinSession = async ({ sessionId, userName }, callback, socket) => {
   console.log(`joining a session: ${JSON.stringify({ sessionId, userName })}`);
   if (!userName) {
     userName = "Anonymous";
   }
-  rootRef.child(sessionId).once("value", (snapshot) => {
-    if (!snapshot.val()) {
+  await rootRef.child(sessionId).once("value", (snapshot) => {
+    if (!objExists(snapshot.val())) {
       callback({ success: false });
+      console.log("returned.");
       return;
     }
   });
+  console.log("here");
   const userId = rootRef.child(`users`).push().key;
   rootRef.child(`${sessionId}/users`).update({ [userId]: { name: userName } });
   refreshCache(sessionId, () => {
@@ -117,6 +127,18 @@ let joinSession = ({ sessionId, userName }, callback, socket) => {
       userId: userId,
       restaurants: activeSessions[sessionId].restaurants,
     });
+  });
+};
+
+let setName = ({ sessionId, userId, userName }, callback, socket) => {
+  const userRef = rootRef.child(`${sessionId}/users/${userId}`);
+  userRef.once("value", (snapshot) => {
+    if (objExists(snapshot.val())) {
+      userRef.update({ name: userName });
+      callback(true);
+    } else {
+      callback(false);
+    }
   });
 };
 
@@ -139,7 +161,10 @@ let addRestaurant = ({ sessionId, restaurant }, callback) => {
   rootRef
     .child(`${sessionId}/restaurants/${restaurant.id}`)
     .update({ votes: true });
-  io.in(sessionId).emit("addedRestaurant", {business: restaurant, votes: newVoteArray()});
+  io.in(sessionId).emit("addedRestaurant", {
+    business: restaurant,
+    votes: newVoteArray(),
+  });
   refreshCache(sessionId, () => {
     activeSessions[sessionId].restaurants[restaurant.id] = {
       business: restaurant,
@@ -159,11 +184,17 @@ let voteOnRestaurant = ({ sessionId, restaurantId, userId, voteNum }) => {
     })}`
   );
   let voteRef = rootRef.child(`${sessionId}/restaurants/${restaurantId}/votes`);
+  voteRef.once('value', (snapshot) => {
+    const allVotes = snapshot.val();
+    Object.entries(allVotes).map()
+  })
   voteRef.update({ [voteNum]: { [userId]: true } });
-  
+
   // let userRef = rootRef.child(`${sessionId}/users`);
-const currentUsers = activeSessions[sessionId].users;
-activeSessions[sessionId].restaurants[restaurantId].votes[+voteNum].push(currentUsers[userId].name)
+  const currentUsers = activeSessions[sessionId].users;
+  activeSessions[sessionId].restaurants[restaurantId].votes[+voteNum].push(
+    currentUsers[userId].name
+  );
   io.in(sessionId).emit("addedVote", {
     restaurantId: restaurantId,
     vote: {
@@ -171,8 +202,9 @@ activeSessions[sessionId].restaurants[restaurantId].votes[+voteNum].push(current
       names: (voteRef[voteNum] ? Object.keys(voteRef[voteNum]) : [])
         .concat([userId])
         .map((userId) => {
-          console.log(`currentUsers is ${JSON.stringify(currentUsers)}`)
-          return (currentUsers[userId] ? currentUsers[userId].name : "N/A")}),
+          console.log(`currentUsers is ${JSON.stringify(currentUsers)}`);
+          return currentUsers[userId] ? currentUsers[userId].name : "N/A";
+        }),
     },
   });
 };
@@ -196,7 +228,7 @@ refreshCache = (sessionId, callback) => {
     .once("value")
     .then((snapshot) => {
       const root = snapshot.val();
-      if (!root) {
+      if (!objExists(root)) {
         return;
       }
       console.log(`root is ${JSON.stringify(root)}`);
@@ -204,7 +236,7 @@ refreshCache = (sessionId, callback) => {
         Object.keys(root.restaurants).map(getRestaurantById)
       ).then((results) => {
         console.log(`results of promise.allSettled: ${results}`);
-        
+
         activeSessions[sessionId] = {
           location: root.location,
           users: root.users,
@@ -219,7 +251,7 @@ refreshCache = (sessionId, callback) => {
                     vArr[+voteNum].push(root.users[v].name);
                   });
                 }
-              )
+              );
               return {
                 business: b,
                 votes: vArr,
