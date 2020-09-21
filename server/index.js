@@ -7,7 +7,7 @@ const axios = require("axios"),
 const PORT = process.env.PORT || 4000;
 
 const activeSessions = {};
-const VOTE_VALUES = 3;
+const VOTE_VALUES = 4;
 
 const objExists = (obj) => {
   console.log(`objExists method: obj is ${JSON.stringify(obj)}`);
@@ -99,7 +99,7 @@ let resumeSession = ({ sessionId }, callback, socket) => {
     socket.join(sessionId);
     callback({
       success: true,
-      restaurants: activeSessions[sessionId].restaurants,
+      restaurants: shapeRestaurants(activeSessions[sessionId].restaurants, activeSessions[sessionId].users),
     });
   });
 };
@@ -122,10 +122,12 @@ let joinSession = async ({ sessionId, userName }, callback, socket) => {
   refreshCache(sessionId, () => {
     activeSessions[sessionId].users[userId] = { name: userName };
     socket.join(sessionId);
+    // let currentRestaurants = activeSessions[sessionId].restaurants
+    // Object.keys(currentRestaurants).forEach((id) => currentRestaurants[id] = {...currentRestaurants[id], votes: shapeVotes(currentRestaurants[id].votes, activeSessions[sessionId].users)})
     callback({
       success: true,
       userId: userId,
-      restaurants: activeSessions[sessionId].restaurants,
+      restaurants: shapeRestaurants(activeSessions[sessionId].restaurants, activeSessions[sessionId].users),
     });
   });
 };
@@ -142,12 +144,26 @@ let setName = ({ sessionId, userId, userName }, callback, socket) => {
   });
 };
 
-let newVoteArray = () => {
-  let voteArr = new Array(VOTE_VALUES);
-  for (let i = 0; i < VOTE_VALUES; i++) {
-    voteArr[i] = [];
+let newVoteArray = () => new Array(VOTE_VALUES);
+
+let shapeRestaurants = (restaurants, users) => {
+  let shapedRestaurants = {};
+  for(restId in restaurants) {
+    shapedRestaurants[restId] = {...restaurants[restId], votes: shapeVotes(restaurants[restId].votes, users)}
   }
-  return voteArr;
+  return shapedRestaurants;
+}
+
+let shapeVotes = (votes, users) => {
+  let votesArr = newVoteArray();
+  Object.entries(votes).forEach(([userId, v]) => {
+    if (votesArr[v]) {
+      votesArr[v] += `, ${users[userId].name}`;
+    } else {
+      votesArr[v] = users[userId].name;
+    }
+  });
+  return votesArr;
 };
 
 let addRestaurant = ({ sessionId, restaurant }, callback) => {
@@ -160,7 +176,7 @@ let addRestaurant = ({ sessionId, restaurant }, callback) => {
   }
   rootRef
     .child(`${sessionId}/restaurants/${restaurant.id}`)
-    .update({ votes: true });
+    .update({ votes: false });
   io.in(sessionId).emit("addedRestaurant", {
     business: restaurant,
     votes: newVoteArray(),
@@ -168,7 +184,7 @@ let addRestaurant = ({ sessionId, restaurant }, callback) => {
   refreshCache(sessionId, () => {
     activeSessions[sessionId].restaurants[restaurant.id] = {
       business: restaurant,
-      votes: newVoteArray(),
+      votes: {},
     };
   });
   callback(true);
@@ -183,86 +199,75 @@ let voteOnRestaurant = ({ sessionId, restaurantId, userId, voteNum }) => {
       voteNum,
     })}`
   );
-  let voteRef = rootRef.child(`${sessionId}/restaurants/${restaurantId}/votes`);
-  voteRef.once('value', (snapshot) => {
-    const allVotes = snapshot.val();
-    Object.entries(allVotes).map()
-  })
-  voteRef.update({ [voteNum]: { [userId]: true } });
-
-  // let userRef = rootRef.child(`${sessionId}/users`);
-  const currentUsers = activeSessions[sessionId].users;
-  activeSessions[sessionId].restaurants[restaurantId].votes[+voteNum].push(
-    currentUsers[userId].name
-  );
-  io.in(sessionId).emit("addedVote", {
-    restaurantId: restaurantId,
-    vote: {
-      level: voteNum,
-      names: (voteRef[voteNum] ? Object.keys(voteRef[voteNum]) : [])
-        .concat([userId])
-        .map((userId) => {
-          console.log(`currentUsers is ${JSON.stringify(currentUsers)}`);
-          return currentUsers[userId] ? currentUsers[userId].name : "N/A";
-        }),
-    },
-  });
-};
-
-let getRestaurantById = (id) =>
-  yelpFusion(`https://api.yelp.com/v3/businesses/${id}`);
-
-let restaurantSearch = (searchTerm) =>
-  yelpFusion(
-    `https://api.yelp.com/v3/businesses/search?categories=restaurant&location=55105&term=${searchTerm}`
-  );
-
-refreshCache = (sessionId, callback) => {
-  if (activeSessions[sessionId]) {
-    console.log("there is already an active session.");
-    callback();
-    return;
-  }
-  rootRef
-    .child(sessionId)
-    .once("value")
-    .then((snapshot) => {
-      const root = snapshot.val();
-      if (!objExists(root)) {
-        return;
-      }
-      console.log(`root is ${JSON.stringify(root)}`);
-      Promise.allSettled(
-        Object.keys(root.restaurants).map(getRestaurantById)
-      ).then((results) => {
-        console.log(`results of promise.allSettled: ${results}`);
-
-        activeSessions[sessionId] = {
-          location: root.location,
-          users: root.users,
-          restaurants: results
-            .filter((r) => r.status === "fulfilled")
-            .map((r) => {
-              const b = r.value.data;
-              let vArr = newVoteArray();
-              Object.entries(root.restaurants[b.id].votes).map(
-                ([voteNum, val]) => {
-                  Object.keys(val).forEach((v) => {
-                    vArr[+voteNum].push(root.users[v].name);
-                  });
-                }
-              );
-              return {
-                business: b,
-                votes: vArr,
-              };
-            })
-            .reduce((obj, cur) => {
-              return { ...obj, [cur.business.id]: cur };
-            }, {}),
-        };
-        callback();
+  refreshCache(sessionId, () => {
+    let voteRef = rootRef.child(
+      `${sessionId}/restaurants/${restaurantId}/votes`
+    );
+    const currentUsers = activeSessions[sessionId].users;
+    voteRef.once("value", (snapshot) => {
+      // const allVotes = snapshot.val();
+      activeSessions[sessionId].restaurants[restaurantId].votes[
+        userId
+      ] = +voteNum;
+      voteRef.update({ [userId]: voteNum });
+      io.in(sessionId).emit("addedVote", {
+        restaurantId: restaurantId,
+        votes: shapeVotes(activeSessions[sessionId].restaurants[restaurantId].votes, activeSessions[sessionId].users)
+        // (voteRef[voteNum] ? Object.keys(voteRef[voteNum]) : [])
+        //   .concat([userId])
+        //   .map((userId) => {
+        //     console.log(`currentUsers is ${JSON.stringify(currentUsers)}`);
+        //     return currentUsers[userId] ? currentUsers[userId].name : "N/A";
+        //   }),
       });
-      // .catch(() => console.log(`bad news.`));
     });
-};
+  });
+}
+
+  let getRestaurantById = (id) =>
+    yelpFusion(`https://api.yelp.com/v3/businesses/${id}`);
+
+  let restaurantSearch = (searchTerm) =>
+    yelpFusion(
+      `https://api.yelp.com/v3/businesses/search?categories=restaurant&location=55105&term=${searchTerm}`
+    );
+
+  refreshCache = (sessionId, callback) => {
+    if (activeSessions[sessionId]) {
+      console.log("there is already an active session.");
+      callback();
+      return;
+    }
+    rootRef
+      .child(sessionId)
+      .once("value")
+      .then((snapshot) => {
+        const root = snapshot.val();
+        if (!objExists(root)) {
+          return;
+        }
+        console.log(`root is ${JSON.stringify(root)}`);
+        Promise.allSettled(
+          Object.keys(root.restaurants).map(getRestaurantById)
+        ).then((results) => {
+          console.log(`results of promise.allSettled: ${results}`);
+
+          activeSessions[sessionId] = {
+            location: root.location,
+            users: root.users,
+            restaurants: results
+              .filter((r) => r.status === "fulfilled")
+              .map((r) => ({
+                business: r.value.data,
+                votes: root.restaurants[r.value.data.id].votes ? root.restaurants[r.value.data.id].votes : {},
+              }))
+              .reduce((obj, cur) => {
+                return { ...obj, [cur.business.id]: cur };
+              }, {}),
+          };
+          console.log(`cache was refreshed from firebase, current active session is now ${JSON.stringify(activeSessions[sessionId])}`)
+          callback();
+        });
+        // .catch(() => console.log(`bad news.`));
+      });
+  };

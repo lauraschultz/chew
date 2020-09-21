@@ -6,9 +6,12 @@ export interface Business {
   url: string;
   categories: { alias: string; title: string }[];
   transactions: Transaction[];
-  display_address: string;
+  location: {
+    display_address: string[];
+  }
   display_phone: string;
   hours: [Hours];
+  price: string;
 }
 
 // "special_hours": [
@@ -32,5 +35,5 @@ export interface Hours {
 
 export interface BusinessWithVotes {
   business: Business;
-  votes: Array<Array<string>>;
+  votes: string[];
 }

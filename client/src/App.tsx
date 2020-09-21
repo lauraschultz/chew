@@ -105,7 +105,7 @@ const App: React.FC = () => {
     "addedVote",
     (params: {
       restaurantId: string;
-      vote: { level: number; names: string[] };
+      votes: string[];
     }) => {
       console.log(`recieved ${JSON.stringify(params)}`);
       console.log(params.restaurantId);
@@ -114,9 +114,10 @@ const App: React.FC = () => {
         ...r,
         [params.restaurantId]: {
           business: r[params.restaurantId].business,
-          votes: r[params.restaurantId].votes.map((v, idx) =>
-            idx === params.vote.level ? params.vote.names : v
-          ),
+          votes: params.votes
+          // r[params.restaurantId].votes.map((v, idx) =>
+          //   idx === params.vote.level ? params.vote.names : v
+          // ),
         },
       }));
       // console.log(this);

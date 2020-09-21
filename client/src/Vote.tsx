@@ -1,20 +1,45 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSmile, faMeh, faFrown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { icons } from "./VotingIcons";
 
-const Vote: React.FC<{ addVote: Function, currentVote: number | undefined }> = ({ addVote, currentVote }) => {
-  const icons = [
-    { icon: faSmile, color: "text-green-700", hoverColor: "hover:bg-green-200" },
-    { icon: faMeh, color: "text-yellow-600", hoverColor: "hover:bg-yellow-300" },
-    { icon: faFrown, color: "text-red-700", hoverColor: "hover:bg-red-200" },
-  ];
+const Vote: React.FC<{
+  addVote: Function;
+  currentVote: number | undefined;
+}> = ({ addVote, currentVote }) => {
+  
   return (
-    <form className="bg-gray-300 content-center text-center p-1">
-      <span className="text-gray-800 tracking-wide font-bold italic uppercase">vote: </span>
-      {icons.map((i, idx) => <button className={"px-1 mx-1 rounded-full " + i.color +" " + i.hoverColor} onClick={() => addVote(idx)}>
-        <FontAwesomeIcon icon={i.icon} size="1x" />
-      </button>)}
-      
+    <form
+      className="content-center text-center p-1"
+      onSubmit={(e) => e.preventDefault()}
+    >
+      <span className="text-theme-dark-gray tracking-wide font-bold italic uppercase">
+        vote:{" "}
+      </span>
+      {icons.map((i, idx) => (
+        <button
+          key={idx}
+          className={"fa-layers fa-fw fa-2x m-1"}
+          onClick={() => addVote(idx)}
+        >
+          {/* <span className="inline-block relative"> */}
+          
+            <FontAwesomeIcon
+            className="text-white"
+              icon={faCircle}
+              // size="2x"
+            />
+            <FontAwesomeIcon
+            className={i.color}
+              icon={i.icon}
+              // size="2x"
+            />
+            
+          {/* </span> */}
+        </button>
+      ))}
     </form>
   );
 };
