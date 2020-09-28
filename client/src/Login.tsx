@@ -23,7 +23,7 @@ const Login: React.FC<{joinSession: Function, newSession: Function}> = ({joinSes
     
   };
   return (
-    <div>
+    <>
       <form onSubmit={create}>
         <h2>Create a new session:</h2>
         <label>
@@ -57,7 +57,7 @@ const Login: React.FC<{joinSession: Function, newSession: Function}> = ({joinSes
         </label>
         <button type="submit">join</button>
       </form>
-    </div>
+    </>
   );
 };
 

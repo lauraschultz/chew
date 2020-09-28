@@ -19,6 +19,7 @@ import LoginTemplate from "./Templates/LoginTemplate";
 import AppTemplate from "./Templates/AppTemplate";
 import "./comp.css";
 import ModalContainer from "./ModalContainer";
+import Logo from "./assets/chew_logo.svg";
 
 // let history = createBrowserHistory();
 let sessionId: string;
@@ -32,8 +33,8 @@ const App: React.FC = () => {
     [id: string]: BusinessWithVotes;
   }>({});
   let [showModal, setShowModal] = useState(false);
-  // let modalContent: {title:string, content: React.FC, acceptMsg: string, acceptFunc: Function, closeMsg?:string }
   let modalContent;
+  // let modalContent: {title:string, content: React.FC, acceptMsg: string, acceptFunc: Function, closeMsg?:string }
   let socket = io.connect(SERVER);
   socket.on("addedRestaurant", (restaurant: BusinessWithVotes) => {
     console.log(`someone added ${JSON.stringify(restaurant)}`);
@@ -43,26 +44,43 @@ const App: React.FC = () => {
     }));
   });
 
-  const Modal: React.FC = () => {
+  const UserNameModal: React.FC = () => {
     let [userName, setUserName] = useState("");
     return (
-      <form
-        onSubmit={(e: FormEvent) => {
-          e.preventDefault();
-          joinSession({ sessionId, userName: userName });
-          setShowModal(false);
-        }}
-      >
-        <label>
-          your name:
-          <input
-            value={userName}
-            type="text"
-            onChange={(e) => setUserName(e.target.value)}
-          />
-        </label>
-        <button type="submit">done</button>
-      </form>
+      <>
+        <div className="py-2 px-3 text-white bg-gradient-to-r from-theme-red to-theme-dark-red rounded-t font-bold text-xl">
+          <span className="">Welcome to</span>
+          <img className="inline w-24 ml-1" src={Logo} />
+        </div>
+
+        <form
+          onSubmit={(e: FormEvent) => {
+            e.preventDefault();
+            joinSession({ sessionId, userName: userName });
+            setShowModal(false);
+          }}
+          className="pb-3 px-4 rounded-b bg-white text-gray-800"
+        >
+          <div className="uppercase tracking-wide text-gray-600 text-xs pt-1 pb-4">
+            invited to AAA's session by BBB
+          </div>
+          <label>
+            Your name:
+            <input
+              value={userName}
+              type="text"
+              onChange={(e) => setUserName(e.target.value)}
+              className="border-b-2 border-gray-600 px-1 ml-2"
+            />
+          </label>
+          <button
+            type="submit"
+            className="py-1 px-1 uppercase tracking-wide text-sm text-white bg-theme-yellow block w-full mt-4 rounded shadow font-bold"
+          >
+            Join
+          </button>
+        </form>
+      </>
     );
   };
 
@@ -85,7 +103,7 @@ const App: React.FC = () => {
         } else {
           sessionId = match.params.sessionId;
           console.log("modal");
-          modalContent = <Modal />;
+          modalContent = <UserNameModal />;
           setShowModal(true);
         }
       }
@@ -103,10 +121,7 @@ const App: React.FC = () => {
 
   socket.on(
     "addedVote",
-    (params: {
-      restaurantId: string;
-      votes: string[];
-    }) => {
+    (params: { restaurantId: string; votes: string[] }) => {
       console.log(`recieved ${JSON.stringify(params)}`);
       console.log(params.restaurantId);
       console.log(addedRestaurants);
@@ -114,7 +129,7 @@ const App: React.FC = () => {
         ...r,
         [params.restaurantId]: {
           business: r[params.restaurantId].business,
-          votes: params.votes
+          votes: params.votes,
           // r[params.restaurantId].votes.map((v, idx) =>
           //   idx === params.vote.level ? params.vote.names : v
           // ),
@@ -238,9 +253,9 @@ const App: React.FC = () => {
   return (
     // <Router history={history}>
     // <BrowserRouter>
-    <div>
+    <>
       <ModalContainer show={showModal}>
-        <Modal />
+        <UserNameModal />
       </ModalContainer>
       <Switch>
         <Route path="/getStarted">
@@ -252,22 +267,49 @@ const App: React.FC = () => {
             />
           </LoginTemplate>
         </Route>
-        <Route path="/ID/:sessionId" exact>
-          <AppTemplate>
-            <Display
-              restaurants={addedRestaurants}
-              voteOnRestaurant={voteOnRestaurant}
-            />
-            <div className="invisible md:visible">
-              <Search
-                search={search}
-                addRestaurant={addRestaurant}
-                voteOnRestaurant={voteOnRestaurant}
-              ></Search>
-            </div>
-          </AppTemplate>
-        </Route>
-        <Route path="/ID/:sessionId/search" exact>
+        <Route
+          path="/ID/:sessionId"
+          render={(props) => (
+            <AppTemplate
+              {...props}
+              search={
+                <div className="flex-1 pt-4">
+                  <Search
+                    search={search}
+                    addRestaurant={addRestaurant}
+                    voteOnRestaurant={voteOnRestaurant}
+                  />
+                </div>
+              }
+              display={
+                <div className="flex-1 pt-4">
+                  <Display
+                    restaurants={addedRestaurants}
+                    voteOnRestaurant={voteOnRestaurant}
+                  />
+                </div>
+              }
+            >
+              {/* <div className="flex justify-around px-1 pt-4">
+              <div className="flex-1">
+                <Display
+                  restaurants={addedRestaurants}
+                  voteOnRestaurant={voteOnRestaurant}
+                />
+              </div>
+              <Route path="/ID/:sessionId/search" exact render={()=><div className="hidden flex-1 md:flex">
+                <Search
+                  search={search}
+                  addRestaurant={addRestaurant}
+                  voteOnRestaurant={voteOnRestaurant}
+                ></Search>
+              </div>} />
+              
+            </div> */}
+            </AppTemplate>
+          )}
+        ></Route>
+        {/* <Route path="/ID/:sessionId/search" exact>
           <AppTemplate>
             <Search
               search={search}
@@ -275,14 +317,14 @@ const App: React.FC = () => {
               voteOnRestaurant={voteOnRestaurant}
             />
           </AppTemplate>
-        </Route>
+        </Route> */}
         <Route path="/" exact>
           <Redirect to="/getStarted" />
         </Route>
       </Switch>
       {/* </Router> */}
       {/* </BrowserRouter> */}
-    </div>
+    </>
   );
 };
 

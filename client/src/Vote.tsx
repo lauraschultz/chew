@@ -12,10 +12,10 @@ const Vote: React.FC<{
   
   return (
     <form
-      className="content-center text-center p-1"
+      className="flex items-center justify-center p-1"
       onSubmit={(e) => e.preventDefault()}
     >
-      <span className="text-theme-dark-gray tracking-wide font-bold italic uppercase">
+      <span className="text-theme-dark-gray tracking-wide font-bold italic uppercase mt-4">
         vote:{" "}
       </span>
       {icons.map((i, idx) => (
