@@ -5,3 +5,9 @@
 @tailwind components;
 
 @tailwind utilities;
+
+@layer base {
+    #root {
+        @apply flex flex-col min-h-screen bg-theme-light
+    }
+}

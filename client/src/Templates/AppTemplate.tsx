@@ -7,7 +7,7 @@ import {
   faUtensils,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactFragment } from "react";
+import React, { FormEvent, ReactFragment, useEffect, useState } from "react";
 import Media from "react-media";
 import {
   Link,
@@ -21,14 +21,107 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import Logo from "../assets/chew_logo.svg";
+import { useAddedRestaurants, useUserData } from "../customHooks";
+import Footer from "../Footer";
+import ModalContainer from "../ModalContainer";
+// import { setUserName } from "../socket";
+import socket from "../socket";
 
 interface Props extends RouteComponentProps<{ sessionId: string }> {
   search: ReactFragment;
   display: ReactFragment;
 }
 
-const AppTemplate: React.FC<Props> = ({ children, match, display, search }) => {
-  console.log(`match!! ${JSON.stringify(match)}`);
+const UserNameModal: React.FC = () => {
+  let [currentUserName, setCurrentUserName] = useState("");
+  let { sessionId, userId, setUserState } = useUserData();
+  return (
+    <>
+      <div className="py-2 px-3 text-white bg-gradient-to-r from-theme-red to-theme-dark-red rounded-t font-bold text-xl">
+        <span className="">Welcome to</span>
+        <img className="inline w-24 ml-1" src={Logo} />
+      </div>
+      <form
+        className="pb-3 px-4 rounded-b bg-white text-gray-800"
+        onSubmit={(e: FormEvent) => {
+          e.preventDefault();
+          if(userId){
+            socket.setUserName(
+            { sessionId, userId, userName: currentUserName },
+            (response) => {
+              console.log(`result of setting name: ${response.success}`);
+              if (response.success) {
+                setUserState("canVote");
+              }
+            }
+          );
+          }
+          
+        }}
+      >
+        <div className="uppercase tracking-wide text-gray-600 text-xs pt-1 pb-4">
+          invited to AAA's session by BBB
+        </div>
+        <label>
+          your name:
+          <input
+            value={currentUserName}
+            type="text"
+            onChange={(e) => setCurrentUserName(e.target.value)}
+            className="border-b-2 border-gray-600 px-1 ml-2"
+          />
+        </label>
+        <button
+          type="submit"
+          className="py-1 px-1 uppercase tracking-wide text-sm text-white bg-theme-yellow block w-full mt-4 rounded shadow font-bold"
+        >
+          done
+        </button>
+      </form>
+    </>
+  );
+};
+
+const AppTemplate: React.FC<Props> = ({ location, display, search }) => {
+  let {
+    userState,
+    setUserState,
+    sessionId,
+    setSessionId,
+    userId,
+    setUserId,
+  } = useUserData();
+  let loaded = false;
+  // let [localUserState, setLocalUserState]= useState<string>("canView");
+  let { setAddedRestaurants } = useAddedRestaurants();
+  useEffect(() => {
+    // console.log(`history state is ${JSON.stringify(history.state)}`)
+    // if (userState === "canView") {
+      console.log(`userState is ${userState}, trying to join session.`);
+      socket.tryJoinSession({ sessionId, userId }, (response) => {
+        console.log(
+          `response from tryJoinSession is ${JSON.stringify(response)}`
+        );
+        if (response.success) {
+          setSessionId(sessionId);
+          setUserId(response.userId);
+          setUserState(
+            response.previouslyAuthenticated ? "canVote" : "canView"
+          );
+          setAddedRestaurants(response.restaurants || {});
+          // history.push(`/ID/${match.params.sessionId}`);
+        } else {
+          console.log("recieved failure from server");
+        }
+      });
+      //else redirect?????
+    // }
+    return () => {loaded = true}
+  }, [sessionId]);
+
+  // useEffect(() => {
+  //   (userCanVote = userState === "canVote"), [userState];
+  // });
   // let history = useHistory();
   // const currentUrlMatch = matchPath<{sessionId?:string}>(history.location.pathname, 'sessionId');
   // console.log(currentUrlMatch?.params.sessionId)
@@ -36,7 +129,12 @@ const AppTemplate: React.FC<Props> = ({ children, match, display, search }) => {
   // currentUrlMatch?.params.sessionId;
 
   return (
-    <div className="bg-theme-light font-body h-screen w-screen text-theme-dark-gray overflow-y-scroll">
+    <>
+      {loaded && userState !== "canVote" && (
+        <ModalContainer>
+          <UserNameModal />
+        </ModalContainer>
+      )}
       <header className="bg-theme-red text-white shadow ">
         <nav className="flex justify-between p-1 lg:p-3">
           <img
@@ -53,7 +151,7 @@ const AppTemplate: React.FC<Props> = ({ children, match, display, search }) => {
         </nav>
         <div className="md:hidden uppercase font-bold tracking-wide py-1 text-sm bg-theme-dark-red">
           <NavLink
-            to={`/ID/${match.params.sessionId}`}
+            to={`/ID/${sessionId}`}
             exact={true}
             className="p-1 m-1"
             activeClassName="border-b-2 border-white"
@@ -62,7 +160,7 @@ const AppTemplate: React.FC<Props> = ({ children, match, display, search }) => {
             view restaurants
           </NavLink>
           <NavLink
-            to={`/ID/${match.params.sessionId}/search`}
+            to={`/ID/${sessionId}/search`}
             exact={true}
             className="p-1 m-1"
             activeClassName="border-b-2 border-white"
@@ -73,83 +171,45 @@ const AppTemplate: React.FC<Props> = ({ children, match, display, search }) => {
         </div>
       </header>
 
-      {/* LARGE DISPLAYS */}
-      <Media
-        query="(min-width: 768px)"
-        render={() => (
-          <Switch>
-            <Route
-              path="/ID/:sessionId"
-              exact
-              render={() => (
-                <div className="flex justify-around px-1">
-                  {display} {search}
-                </div>
-              )}
-            />
-            <Route
-              path="/"
-              render={() => <Redirect to={`/ID/${match.params.sessionId}"`} />}
-            />
-          </Switch>
-        )}
-      />
+      <main className="flex-grow">
+        {/* LARGE DISPLAYS */}
+        <Media
+          query="(min-width: 768px)"
+          render={() => (
+            <Switch>
+              <Route
+                path="/ID/:sessionId"
+                exact
+                render={() => (
+                  <div className="flex justify-around px-1">
+                    {display} {search}
+                  </div>
+                )}
+              />
+              <Route
+                path="/"
+                render={() => <Redirect to={`/ID/${sessionId}"`} />}
+              />
+            </Switch>
+          )}
+        />
 
-      {/* SMALL DISPLAYS */}
-      <Media
-        query="(max-width: 767px)"
-        render={() => (
-          <Switch>
-            <Route path="/ID/:sessionId" exact render={() => display} />
-            <Route path="/ID/:sessionId/search" exact render={() => search} />
-          </Switch>
-        )}
-      />
+        {/* SMALL DISPLAYS */}
+        <Media
+          query="(max-width: 767px)"
+          render={() => (
+            <Switch>
+              <Route path="/ID/:sessionId" exact render={() => display} />
+              <Route path="/ID/:sessionId/search" exact render={() => search} />
+            </Switch>
+          )}
+        />
+      </main>
 
       {/* {children} */}
 
-      <footer className="text-theme-red">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-          <path
-            fill="currentColor"
-            fill-opacity="1"
-            d="M0,256L34.3,234.7C68.6,213,137,171,206,138.7C274.3,107,343,85,411,96C480,107,549,149,617,186.7C685.7,224,754,256,823,245.3C891.4,235,960,181,1029,176C1097.1,171,1166,213,1234,208C1302.9,203,1371,149,1406,122.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"
-          ></path>
-        </svg>
-        <div className="bg-theme-red text-white px-2 md:px-8 lg:p-24 pb-6 flex justify-around leading-tight">
-          <div className="flex-1">
-            <p>
-              <FontAwesomeIcon icon={faCopyright} size="sm" className="mr-2" />
-              <a href="" target="_blank">
-                Laura Schultz
-              </a>{" "}
-              2020
-            </p>
-            <a
-              className="block"
-              href="http://github.com/lauraschultz/chew"
-              target="_blank"
-            >
-              <FontAwesomeIcon icon={faStar} size="sm" className="mr-2" />
-              star on Github
-            </a>
-          </div>
-          <div className="flex-1">
-            <a className="block">
-              <FontAwesomeIcon
-                icon={faFileSignature}
-                size="sm"
-                className="mr-2"
-              />
-              terms of use & privacy policy
-            </a>
-          </div>
-
-          {/* <Link to="">show restaurants</Link>
-          <Link to="">show search</Link> */}
-        </div>
-      </footer>
-    </div>
+      <Footer />
+    </>
   );
 };
 

@@ -1,15 +1,16 @@
 import React from "react";
+import Footer from "../Footer";
 
 const LoginTemplate: React.FC = ({ children }) => {
   return (
     <>
-      <nav>
-        <a href="/">restaurant chooser</a>
-      </nav>
+      <main className="flex-grow flex justify-center w-screen items-center">
+        {children}
+      </main>
 
-      {children}
+      
 
-      <footer>please star me on github</footer>
+      <Footer />
     </>
   );
 };

@@ -7,18 +7,13 @@ import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import DisplayItem from "./DisplayItem";
+import { useUserData } from "./customHooks";
 
 const DisplaySearchResults: React.FC<{
   businesses: Business[];
-  addRestaurant: Function;
   voteOnRestaurant: Function;
-}> = ({ businesses, addRestaurant, voteOnRestaurant }) => {
-  //   let add = (restaurantId: string) => {
-  //     axios.post(`${SERVER}/add/gabbagoo/${restaurantId}`).then();
-  //   };
-  // let addVote = (vote: number, restaurantId: string) => {
-  //   voteOnRestaurant()
-  // }
+}> = ({ businesses, voteOnRestaurant }) => {
+  let {sessionId, userId} = useUserData();
   let [displayVoteComponent, setDisplayVoteComponent] = useState<{
     [id: string]: boolean;
   }>({});
@@ -50,7 +45,7 @@ const DisplaySearchResults: React.FC<{
                 className="py-1 px-2 mr-2 text-theme-med-gray border-2 border-theme-light-gray rounded-full group"
                 onClick={() => {
                   if (!displayVoteComponent[b.id]) {
-                    addRestaurant(b);
+                    axios.post(`${SERVER}/addRestaurant/${sessionId}/${userId}/${b.id}`)
                     toggle(b.id);
                   }
                 }}
@@ -77,10 +72,9 @@ const DisplaySearchResults: React.FC<{
 };
 
 const Search: React.FC<{
-  search: Function;
-  addRestaurant: Function;
+  search: (term: string) => Promise<Business[]>;
   voteOnRestaurant: Function;
-}> = ({ search, addRestaurant, voteOnRestaurant }) => {
+}> = ({ search, voteOnRestaurant }) => {
   let [searchTerm, setSearchTerm] = useState("");
   let [businesses, setBusinesses] = useState(new Array<Business>());
   useEffect(() => businessCacheService.add(businesses), [businesses]);
@@ -94,7 +88,7 @@ const Search: React.FC<{
         className="p-2 w-full"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          search(searchTerm).subscribe((b: Business[]) => setBusinesses(b));
+          search(searchTerm).then((b: Business[]) => setBusinesses(b));
         }}
       >
         <input
@@ -115,7 +109,6 @@ const Search: React.FC<{
       </form>
       <DisplaySearchResults
         businesses={businesses}
-        addRestaurant={addRestaurant}
         voteOnRestaurant={voteOnRestaurant}
       />
     </div>

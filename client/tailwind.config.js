@@ -10,6 +10,9 @@ module.exports = {
       body: "Lato",
     },
     extend: {
+      transitionProperty: {
+        spacing: "margin",
+      },
       colors: {
         "theme-red": "#E8505B",
         "theme-dark-red": "#C6535B",
@@ -30,6 +33,8 @@ module.exports = {
       },
     },
   },
-  variants: {},
+  variants: {
+    margin: ["responsive", "hover", "group-hover"],
+  },
   plugins: [],
 };

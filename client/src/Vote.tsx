@@ -4,11 +4,16 @@ import {
   faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { icons } from "./VotingIcons";
+import { useUserData } from "./customHooks";
 
 const Vote: React.FC<{
   addVote: Function;
   currentVote: number | undefined;
 }> = ({ addVote, currentVote }) => {
+  let {userState} = useUserData()
+  if(userState === "canView"){
+    return null;
+  }
   
   return (
     <form
