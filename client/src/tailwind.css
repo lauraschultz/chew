@@ -8,6 +8,6 @@
 
 @layer base {
     #root {
-        @apply flex flex-col min-h-screen bg-theme-light
+        @apply flex flex-col min-h-screen bg-theme-light font-body
     }
 }

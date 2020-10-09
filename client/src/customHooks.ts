@@ -14,6 +14,7 @@ export function useAddedRestaurants() {
   let [addedRestaurants, setAddedRestaurants] = useState<{
     [id: string]: BusinessWithVotes;
   }>({});
+  console.log(`restaurants hook, addedRestaurants is ${JSON.stringify(addedRestaurants)}`)
 
   useEffect(
     () =>
@@ -23,25 +24,7 @@ export function useAddedRestaurants() {
     [addedRestaurants]
   );
 
-  socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
-    console.log('recieving an added restaurant.')
-    setAddedRestaurants((r) => ({
-      ...r,
-      [newRestaurant.business.id]: newRestaurant,
-    }));
-  });
-
-  socket.subscribeToVoteAdded(
-    (params: { restaurantId: string; votes: string[] }) => {
-      setAddedRestaurants((r) => ({
-        ...r,
-        [params.restaurantId]: {
-          ...r[params.restaurantId],
-          votes: params.votes,
-        },
-      }));
-    }
-  );
+  
 
   return { addedRestaurants, setAddedRestaurants };
 }
@@ -72,15 +55,7 @@ export function useUserData() {
     }
   }, [userId]);
 
-  useEffect(() => {
-    console.log(`location useEffect`);
-    const match = matchPath<{ sessionId: string }>(location.pathname, {
-      path: "/ID/:sessionId",
-    });
-    if (match) {
-      setSessionId(match.params.sessionId);
-    }
-  }, [location]);
+  
 
   // useEffect(() => {
   //   console.log(`starting useEffect, userState is ${userState}`)

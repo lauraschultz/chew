@@ -1,33 +1,35 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { icons } from "./VotingIcons";
-import { useUserData } from "./customHooks";
+import { UserContext } from "./UserDataContext";
 
 const Vote: React.FC<{
   addVote: Function;
   currentVote: number | undefined;
 }> = ({ addVote, currentVote }) => {
-  let {userState} = useUserData()
+  const {userState} = useContext(UserContext)
   if(userState === "canView"){
     return null;
   }
   
   return (
     <form
-      className="flex items-center justify-center p-1"
+      className="flex items-center justify-center"
       onSubmit={(e) => e.preventDefault()}
     >
-      <span className="text-theme-dark-gray tracking-wide font-bold italic uppercase mt-4">
-        vote:{" "}
+      <span className="text-theme-dark-gray tracking-wide font-bold italic uppercase mr-2">
+        vote:
       </span>
       {icons.map((i, idx) => (
         <button
           key={idx}
           className={"fa-layers fa-fw fa-2x m-1"}
           onClick={() => addVote(idx)}
+          aria-label={i.descText}
+          data-balloon-pos="down"
         >
           {/* <span className="inline-block relative"> */}
           

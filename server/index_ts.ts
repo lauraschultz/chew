@@ -4,7 +4,6 @@ import firebase from "firebase";
 import socket from "socket.io";
 import {
   Business,
-  SetUserNameCallback,
   BusinessWithVotes,
   NewSessionData,
   NewSessionCallback,
@@ -41,24 +40,31 @@ app.use(function (req, res, next) {
 app.get(
   "/search/:sessionId/:searchTerm",
   async (req: express.Request, res: express.Response) => {
+    console.log(`searching: ${JSON.stringify(req.params)}`)
     const { sessionId, searchTerm } = req.params;
     await refreshCache(sessionId);
+    // console.log(`refreshed cache: ${JSON.stringify(sessionCache)}`)
     restaurantSearch(
       searchTerm,
-      sessionCache[sessionId].location
+      sessionCache[sessionId].location || ''
     ).then((result) => res.send(result));
   }
 );
 
 app.post(
   "/setUserName/:sessionId/:userId/:userName",
-  (req: express.Request, res: express.Response) => {}
+  (req: express.Request, res: express.Response) => {
+    const { sessionId, userId, userName } = req.params;
+    setUserName(sessionId, userId, userName ).then((r) => res.send(r));
+  }
 );
 
 app.post(
   "/addVote/:sessionId/:userId/:restaurantId/:voteNum",
   (req: express.Request, res: express.Response) => {
-    req;
+    const {sessionId, userId, restaurantId, voteNum} = req.params;
+    addVote(sessionId, userId, restaurantId, +voteNum);
+    res.send(true);
   }
 );
 
@@ -67,6 +73,7 @@ app.post(
   (req: express.Request, res: express.Response) => {
     const { sessionId, userId, restaurantId } = req.params;
     addRestaurant(sessionId, userId, restaurantId);
+    res.send(true);
   }
 );
 
@@ -95,6 +102,7 @@ const newSession = (
   socket.join(sessionId);
   console.log(`socket ${socket.id} joined ${sessionId}.`);
   const userId = data.userId || generateUserId();
+  // new session in cache
   sessionCache[sessionId] = {
     location: data.location,
     creator: userId,
@@ -103,13 +111,18 @@ const newSession = (
     },
     restaurants: {},
   };
-  rootRef.child(sessionId).update({
-    location: data.location,
-    creator: userId,
-    restaurants: false,
-    users: { [userId]: { name: data.userName } },
-  });
-  callback({ sessionId, userId });
+  // new session in firebase
+  rootRef
+    .update({
+      [sessionId]: {
+        location: data.location,
+        creator: userId,
+        restaurants: false,
+        users: { [userId]: { name: data.userName } },
+      },
+    })
+    .then(() => callback({ success: true, sessionId, userId }))
+    .catch((e) => callback({success:false, errorMessage: e}));
 };
 
 const tryJoinSession = async (
@@ -135,7 +148,7 @@ const tryJoinSession = async (
       userId: userId,
       previouslyAuthenticated: previouslyAuthenticated,
       restaurants: await joinRestaurants(data.sessionId),
-      location: sessionCache[data.sessionId].location
+      location: sessionCache[data.sessionId].location,
     });
   } else {
     console.log(`sending failure callback.`);
@@ -144,24 +157,54 @@ const tryJoinSession = async (
 };
 
 const setUserName = async (
-  data: SetUserNameData,
-  callback: SetUserNameCallback,
-  socket: socket.Socket
-) => {
-  console.log(`setting userName: ${JSON.stringify(data)}`);
-  await refreshCache(data.sessionId);
-  if (!sessionCache[data.sessionId]) {
-    callback({ success: false });
-    return;
+  sessionId: string, userId: string, userName: string
+): Promise<boolean> => {
+  console.log(`setting userName: ${JSON.stringify({sessionId, userId, userName})}`);
+  await refreshCache(sessionId);
+  if (!sessionCache[sessionId]) {
+    // callback({ success: false });
+    return false;
   }
   // update in cache
-  sessionCache[data.sessionId].users[data.userId] = { name: data.userName };
+  sessionCache[sessionId].users[userId] = { name: userName };
+  // update in firebase
+  await rootRef
+    .child(`${sessionId}/users/${userId}`)
+    .update({ name: userName })
+    .then()
+    return true;
+  // callback({ success: true });
+  ;
+};
+
+const addVote = async (
+  sessionId: string,
+  userId: string,
+  restaurantId: string,
+  voteNum: number
+) => {
+  await refreshCache(sessionId);
+  // update in cache
+  if(sessionCache[sessionId].restaurants[restaurantId]){
+    (sessionCache[sessionId].restaurants[restaurantId] as Votes)[userId] = voteNum;
+  } else {
+    sessionCache[sessionId].restaurants[restaurantId] = {[userId]: voteNum}
+  }
+
   // update in firebase
   rootRef
-    .child(`${data.sessionId}/users/${data.userId}`)
-    .update({ name: data.userName });
-  callback({ success: true });
-};
+    .child(`${sessionId}/restaurants/${restaurantId}`)
+    .update({ [userId]: voteNum })
+    .then(() => {
+      console.log("emitting addedVote");
+  io.in(sessionId).emit("addedVote", {
+    restaurantId: restaurantId,
+    votes: shapeVotes(sessionCache[sessionId].restaurants[restaurantId], sessionCache[sessionId].users),
+  });
+    });
+  
+
+}
 
 const addRestaurant = async (
   sessionId: string,
@@ -176,7 +219,10 @@ const addRestaurant = async (
     sessionCache[sessionId].restaurants = { [restaurantId]: {} };
   }
   // update in firebase
-  rootRef.child(`${sessionId}/restaurants`).update({ [restaurantId]: false });
+  rootRef
+    .child(`${sessionId}/restaurants`)
+    .update({ [restaurantId]: false })
+    .then();
   console.log("emitting addedRestaurant");
   io.in(sessionId).emit("addedRestaurant", {
     business: await memoizedGetRestaurantById(restaurantId),

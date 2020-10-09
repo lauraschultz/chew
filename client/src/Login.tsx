@@ -11,37 +11,23 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 // import { newSession } from "./socket";
 import socket from "./socket";
-import { useUserData } from "./customHooks";
+import { UserContextConsumer } from "./UserDataContext";
 
 const Login: React.FC = () => {
   let [userName, setUserName] = useState(""),
-    [location, setLocation] = useState(""),
-    {
-      sessionId,
-      setSessionId,
-      userId,
-      setUserId,
-      setUserState,
-    } = useUserData();
+    [location, setLocation] = useState("");
+    // {
+    //   sessionId,
+    //   setSessionId,
+    //   userId,
+    //   setUserId,
+    //   setUserState,
+    // } = useUserData();
   // [sessionId, setSessionId] = useState("");
 
-  let history = useHistory();
+  // let history = useHistory();
 
-  let create = (e: FormEvent) => {
-    e.preventDefault();
-    socket.newSession({ userName, location, userId }, (response) => {
-      console.log(
-        `emitting newSession. data is ${userName} ${location} ${userId}`
-      );
-      setSessionId(response.sessionId);
-      setUserId(response.userId);
-      setUserState("canVote");
-      // history.replace()
-      history.push(`/ID/${response.sessionId}`);
-    });
-    // history.push("/home");
-    // setSessionId(sessId)
-  };
+  
 
   // let join = (e: FormEvent) => {
   //   e.preventDefault();
@@ -59,48 +45,49 @@ const Login: React.FC = () => {
           aliquid, accusantium dicta natus odio ducimus? Blanditiis architecto
           aliquam nam.
         </p>
+        <UserContextConsumer>
+          {(context) => (
+            <form
+              onSubmit={(e) => context.createSession(e, userName, location)}
+              className="p-3 bg-gray-100 text-gray-600 rounded my-4 shadow"
+            >
+              <h2 className="font-bold font-display text-xl text-gray-700 italic">
+                Create a new session:
+              </h2>
+              <hr />
+              <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
+                {/* <FontAwesomeIcon icon={faUser} /> */}
+                Your name:
+                <input
+                  className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+              </label>
+              <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
+                {/* <FontAwesomeIcon icon={faMapPin} /> */}
+                Location:
+                <input
+                  className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </label>
+              <div className="text-gray-500 italic text-sm leading-none my-2 ml-4 flex items-center">
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="pr-2 flex-none"
+                  size="2x"
+                />
+                <p className="flex-initial">
+                  Results returned will not be strictly within this area, it
+                  serves as a starting point for your search.
+                </p>
+              </div>
 
-        <form
-          onSubmit={create}
-          className="p-3 bg-gray-100 text-gray-600 rounded my-4 shadow"
-        >
-          <h2 className="font-bold font-display text-xl text-gray-700 italic">
-            Create a new session:
-          </h2>
-          <hr />
-          <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
-            {/* <FontAwesomeIcon icon={faUser} /> */}
-            Your name:
-            <input
-              className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
-          </label>
-          <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
-            {/* <FontAwesomeIcon icon={faMapPin} /> */}
-            Location:
-            <input
-              className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-          </label>
-          <div className="text-gray-500 italic text-sm leading-none my-2 ml-4 flex items-center">
-            <FontAwesomeIcon
-              icon={faInfoCircle}
-              className="pr-2 flex-none"
-              size="2x"
-            />
-            <p className="flex-initial">
-              Results returned will not be strictly within this area, it serves
-              as a starting point for your search.
-            </p>
-          </div>
-
-          {/* <button
+              {/* <button
               disabled
               aria-label="Results returned will not be strictly within this area, it serves as a starting point for your search."
               data-balloon-pos="right"
@@ -109,37 +96,39 @@ const Login: React.FC = () => {
               
             </button> */}
 
-          <div className="relative overflow-hidden group text-white">
-            <button
-              type="submit"
-              className="block w-full p-2 uppercase font-bold tracking-wide bg-theme-yellow rounded shadow"
-            >
-              create
-            </button>{" "}
-            {/* LEFT SIDE */}
-            <FontAwesomeIcon
-              icon={faPizzaSlice}
-              className="absolute left-0 top-0 group-hover:mt-10 group-hover:ml-12 -mt-16 ml-2 opacity-75 transition-spacing duration-300 ease-linear"
-              size="4x"
-            />
-            <FontAwesomeIcon
-              icon={faPizzaSlice}
-              className="absolute left-0 top-0 group-hover:-mt-12 group-hover:ml-24 mt-16 ml-0 opacity-75 transition-spacing duration-300 ease-linear"
-              size="3x"
-            />
-            {/* RIGHT SIDE */}
-            <FontAwesomeIcon
-              icon={faPizzaSlice}
-              className="absolute right-0 top-0 group-hover:mt-10 group-hover:mr-16 -mt-20 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
-              size="4x"
-            />
-            <FontAwesomeIcon
-              icon={faPizzaSlice}
-              className="absolute right-0 top-0 group-hover:-mt-12 group-hover:mr-2 mt-16 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
-              size="3x"
-            />
-          </div>
-        </form>
+              <div className="relative overflow-hidden group text-white">
+                <button
+                  type="submit"
+                  className="block w-full p-2 uppercase font-bold tracking-wide bg-theme-yellow rounded shadow"
+                >
+                  create
+                </button>{" "}
+                {/* LEFT SIDE */}
+                <FontAwesomeIcon
+                  icon={faPizzaSlice}
+                  className="absolute left-0 top-0 group-hover:mt-10 group-hover:ml-12 -mt-16 ml-2 opacity-75 transition-spacing duration-300 ease-linear"
+                  size="4x"
+                />
+                <FontAwesomeIcon
+                  icon={faPizzaSlice}
+                  className="absolute left-0 top-0 group-hover:-mt-12 group-hover:ml-24 mt-16 ml-0 opacity-75 transition-spacing duration-300 ease-linear"
+                  size="3x"
+                />
+                {/* RIGHT SIDE */}
+                <FontAwesomeIcon
+                  icon={faPizzaSlice}
+                  className="absolute right-0 top-0 group-hover:mt-10 group-hover:mr-16 -mt-20 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
+                  size="4x"
+                />
+                <FontAwesomeIcon
+                  icon={faPizzaSlice}
+                  className="absolute right-0 top-0 group-hover:-mt-12 group-hover:mr-2 mt-16 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
+                  size="3x"
+                />
+              </div>
+            </form>
+          )}
+        </UserContextConsumer>
         <div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 m-2 md:m-4 rounded shadow leading-tight">
           If you are trying to join someone else's session, lorem ipsum dolor
           sit amet consectetur adipisicing elit.

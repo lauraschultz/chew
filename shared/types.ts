@@ -50,8 +50,10 @@ export interface NewSessionData {
 }
 
 export type NewSessionCallback = (params: {
-  sessionId: string;
-  userId: string;
+  success: boolean;
+  sessionId?: string;
+  userId?: string;
+  errorMessage?: string;
 }) => void;
 
 export interface TryJoinSessionData {

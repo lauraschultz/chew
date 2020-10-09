@@ -2,62 +2,63 @@ import React, { useState, FormEvent, useEffect } from "react";
 import axios from "axios";
 import { SERVER } from "./config";
 import { Business } from "./YelpInterfaces";
-import businessCacheService from "./BusinessCacheService";
 import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import DisplayItem from "./DisplayItem";
-import { useUserData } from "./customHooks";
+import socket from "./socket";
+import serverService from "./ServerService";
 
 const DisplaySearchResults: React.FC<{
   businesses: Business[];
   voteOnRestaurant: Function;
-}> = ({ businesses, voteOnRestaurant }) => {
-  let {sessionId, userId} = useUserData();
-  let [displayVoteComponent, setDisplayVoteComponent] = useState<{
-    [id: string]: boolean;
-  }>({});
-  let toggle = (id: string) => {
-    console.log(
-      `changing ${id}, currently ${JSON.stringify(displayVoteComponent)}`
-    );
-    setDisplayVoteComponent((old) => ({
-      ...old,
-      [id]: !old[id],
-    }));
-  };
+  isAdded: { [id: string]: boolean };
+  sessionId: string;
+  userId: string;
+}> = ({ businesses, voteOnRestaurant, isAdded, sessionId, userId }) => {
+  // let {sessionId, userId} = useUserData();
+  // let [displayVoteComponent, setDisplayVoteComponent] = useState<{
+  //   [id: string]: boolean;
+  // }>({});
+  // let toggle = (id: string) => {
+  //   console.log(
+  //     `changing ${id}, currently ${JSON.stringify(displayVoteComponent)}`
+  //   );
+  //   setDisplayVoteComponent((old) => ({
+  //     ...old,
+  //     [id]: !old[id],
+  //   }));
+  // };
   return (
     <ul className="divide-y divide-theme-extra-light-gray">
       {businesses.map((b) => (
-        <li>
+        <li key={b.id}>
           <DisplayItem
-            key={b.id}
             restaurant={{ business: b, votes: [] }}
             addRestaurant={
               <button
                 // title={displayVoteComponent[b.id] ? "you have already added" : "add this restaurant"}
                 aria-label={
-                  displayVoteComponent[b.id]
-                    ? "this restaurant has already been added"
-                    : "add this restaurant"
+                  isAdded[b.id]
+                    ? "restaurant has already been added"
+                    : "add restaurant"
                 }
-                data-balloon-pos="down"
+                data-balloon-pos="right"
                 className="py-1 px-2 mr-2 text-theme-med-gray border-2 border-theme-light-gray rounded-full group"
                 onClick={() => {
-                  if (!displayVoteComponent[b.id]) {
-                    axios.post(`${SERVER}/addRestaurant/${sessionId}/${userId}/${b.id}`)
-                    toggle(b.id);
+                  if (!isAdded[b.id]) {
+                    socket.addRestaurant(sessionId, userId, b.id);
                   }
                 }}
               >
-                <FontAwesomeIcon icon={faPlus} />
+                <FontAwesomeIcon icon={isAdded[b.id] ? faCheck : faPlus} />
                 {/* <span className="hidden hover:block absolute">
                 <Tooltip>{displayVoteComponent[b.id] ? <p>you have already added</p> : <p>add this restaurant</p>}</Tooltip>
               </span> */}
               </button>
             }
             vote={
-              displayVoteComponent[b.id] ? (
+              isAdded[b.id] ? (
                 <Vote
                   currentVote={undefined}
                   addVote={(v: number) => voteOnRestaurant(b.id, v)}
@@ -72,12 +73,15 @@ const DisplaySearchResults: React.FC<{
 };
 
 const Search: React.FC<{
-  search: (term: string) => Promise<Business[]>;
+  sessionId: string;
+  userId: string;
   voteOnRestaurant: Function;
-}> = ({ search, voteOnRestaurant }) => {
+  isAdded: { [id: string]: boolean };
+}> = ({ sessionId, userId, voteOnRestaurant, isAdded }) => {
   let [searchTerm, setSearchTerm] = useState("");
   let [businesses, setBusinesses] = useState(new Array<Business>());
-  useEffect(() => businessCacheService.add(businesses), [businesses]);
+  console.log(`SEARCH rerender, isAdded: ${JSON.stringify(isAdded)}`)
+
   return (
     <div className="max-w-md w-full mx-auto">
       <h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none mb-1">
@@ -88,7 +92,9 @@ const Search: React.FC<{
         className="p-2 w-full"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          search(searchTerm).then((b: Business[]) => setBusinesses(b));
+          socket
+            .search(sessionId, searchTerm)
+            .then((b: Business[]) => setBusinesses(b));
         }}
       >
         <input
@@ -110,6 +116,9 @@ const Search: React.FC<{
       <DisplaySearchResults
         businesses={businesses}
         voteOnRestaurant={voteOnRestaurant}
+        isAdded={isAdded}
+        sessionId={sessionId}
+        userId={userId}
       />
     </div>
   );

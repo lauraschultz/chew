@@ -598,7 +598,8 @@ video {
   min-height: 100vh;
   --bg-opacity: 1;
   background-color: #F3EFDA;
-  background-color: rgba(243, 239, 218, var(--bg-opacity))
+  background-color: rgba(243, 239, 218, var(--bg-opacity));
+  font-family: Lato
 }
 
 .container{
