@@ -17,9 +17,11 @@ export const UserContextProvider: React.FC = ({children}) => {
     // let sessionId = '';
     let [userId, setUserId] = useState<string>();
     let [userState, setUserState] = useState('');
+    let [locString, setLocString] = useState('')
+    let [creatorName, setCreatorName] = useState<string>();
     let preAuthenticated = false;
     let history = useHistory();
-    let locString = ''
+    
     let location = useLocation();
 
     useEffect(() => {
@@ -30,16 +32,17 @@ export const UserContextProvider: React.FC = ({children}) => {
       if (match) {
         setSessionId(match.params.sessionId);
       }
-    }, [locString]);
+    }, [location]);
 
     let createSession = (e: FormEvent, userName: string, loc:string) => {
         e.preventDefault();
-        locString = loc;
+        setLocString(loc);
         socket.newSession({ userName, location: loc, userId }, (response) => {
           console.log(
             `emitting newSession. data is ${userName} ${loc} ${userId}`
           );
           setSessionId(response.sessionId || '');
+          setCreatorName(userName);
           setUserId(response.userId);
            setUserState("canVote");
            preAuthenticated = true;
@@ -49,7 +52,7 @@ export const UserContextProvider: React.FC = ({children}) => {
         // history.push("/home");
         // setSessionId(sessId)
       };
-    return <Provider value={{sessionId, setSessionId, userId, setUserId, userState, setUserState, createSession, preAuthenticated, location: locString}}>{children}</Provider>
+    return <Provider value={{sessionId, setSessionId, userId, setUserId, userState, setUserState, createSession, preAuthenticated, location: locString, setLocation: setLocString, creatorName, setCreatorName}}>{children}</Provider>
 }
 
 export {Consumer as UserContextConsumer};

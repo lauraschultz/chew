@@ -99,30 +99,35 @@ const Login: React.FC = () => {
               <div className="relative overflow-hidden group text-white">
                 <button
                   type="submit"
-                  className="block w-full p-2 uppercase font-bold tracking-wide bg-theme-yellow rounded shadow"
+                  className="block w-full p-2 uppercase font-bold tracking-wide bg-theme-yellow hover:bg-theme-dark-yellow rounded shadow"
                 >
                   create
                 </button>{" "}
                 {/* LEFT SIDE */}
                 <FontAwesomeIcon
                   icon={faPizzaSlice}
-                  className="absolute left-0 top-0 group-hover:mt-10 group-hover:ml-12 -mt-16 ml-2 opacity-75 transition-spacing duration-300 ease-linear"
+                  className="absolute left-0 top-0 group-hover:mt-10 group-hover:ml-12 -mt-16 ml-2 opacity-75 transition-spacing duration-500 ease-linear pointer-events-none"
                   size="4x"
                 />
                 <FontAwesomeIcon
                   icon={faPizzaSlice}
-                  className="absolute left-0 top-0 group-hover:-mt-12 group-hover:ml-24 mt-16 ml-0 opacity-75 transition-spacing duration-300 ease-linear"
+                  className="absolute left-0 top-0 group-hover:-mt-12 group-hover:ml-24 mt-12 ml-0 opacity-75 transition-spacing duration-300 ease-linear pointer-events-none"
                   size="3x"
                 />
                 {/* RIGHT SIDE */}
                 <FontAwesomeIcon
                   icon={faPizzaSlice}
-                  className="absolute right-0 top-0 group-hover:mt-10 group-hover:mr-16 -mt-20 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
+                  className="absolute right-0 top-0 group-hover:mt-10 group-hover:mr-24 -mt-20 mr-16 opacity-75 transition-spacing duration-500 ease-linear pointer-events-none"
                   size="4x"
                 />
                 <FontAwesomeIcon
                   icon={faPizzaSlice}
-                  className="absolute right-0 top-0 group-hover:-mt-12 group-hover:mr-2 mt-16 mr-12 opacity-75 transition-spacing duration-300 ease-linear"
+                  className="absolute right-0 top-0 group-hover:-mt-12 group-hover:mr-2 mt-16 mr-12 opacity-75 transition-spacing duration-300 ease-linear pointer-events-none"
+                  size="3x"
+                />
+                <FontAwesomeIcon
+                  icon={faPizzaSlice}
+                  className="absolute right-0 top-0 group-hover:-mt-12 group-hover:mr-20 mt-16 mr-0 opacity-75 transition-spacing duration-300 ease-linear pointer-events-none"
                   size="3x"
                 />
               </div>

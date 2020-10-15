@@ -9,7 +9,8 @@ import {
   faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useContext, useState } from "react";
+import { UserContext } from "./UserDataContext";
 import Vote from "./Vote";
 import { icons } from "./VotingIcons";
 import { BusinessWithVotes, Hours } from "./YelpInterfaces";
@@ -21,6 +22,7 @@ export const DisplayItem: React.FC<{
   vote?: ReactNode;
 }> = ({ restaurant, addRestaurant, vote }) => {
   let [expanded, setExpanded] = useState(false);
+  // let {userState} = useContext(UserContext);
   return (
     <div
       key={restaurant.business.id}
@@ -42,7 +44,7 @@ export const DisplayItem: React.FC<{
       <div className="flex-initial">{addRestaurant}</div>
 
       <div className="flex-1">
-        <h2 className="leading-none font-display italic font-bold text-xl text-theme-dark-gray">
+        <h2 className="leading-tight font-display italic font-bold text-xl text-theme-dark-gray">
           {restaurant.business.name}
           {restaurant.business.price && (
             <span className="ml-2 px-1 rounded bg-theme-med-gray text-white text-sm">
@@ -52,19 +54,19 @@ export const DisplayItem: React.FC<{
             </span>
           )}
         </h2>
-        <div className="pl-2">
-          <div className="text-theme-light-gray font-display leading-tight">
+        <div className="pl-3">
+          <div className="text-theme-light-gray font-display leading-none">
             {restaurant.business.categories.map((c) => c.title).join(", ")}
           </div>
-          {restaurant.business.hours && (
-            <div className="text-theme-med-gray uppercase font-light tracking-wide text-sm leading-tight">
-              <FontAwesomeIcon icon={faClock} />{" "}
+          {restaurant.business.hours && restaurant.business.hours[0] && (
+            <div className="text-theme-light-gray uppercase font-bold tracking-wide text-sm leading-none">
+              <FontAwesomeIcon icon={faClock} className="mr-1" />
               {openMsg(restaurant.business.hours[0])}
             </div>
           )}
 
           {restaurant.votes.length > 0 && (
-            <div className="my-2">
+            <div className="my-1">
               {restaurant.votes.map((v, idx) =>
                 v ? (
                   <span className="m-1 border-theme-dark-gray rounded-sm border-2 bg-white bg-opacity-50 shadow">
@@ -82,7 +84,7 @@ export const DisplayItem: React.FC<{
             <>
               {addRestaurant ? vote : null}
 
-              <div className="flex justify-around">
+              <div className="flex justify-around mt-2">
                 <div className="flex-shrink-0">
                   <HoursTable hours={restaurant.business.hours} />
                 </div>
@@ -142,7 +144,7 @@ export const DisplayItem: React.FC<{
 };
 
 const HoursTable: React.FC<{ hours: [Hours] | undefined }> = ({ hours }) => {
-  if (!hours) {
+  if (!hours || !hours[0]) {
     return (
       <div className="text-theme-light-gray py-2 px-4 rounded my-3 border border-theme-light-gray italic text-sm">
         No hours available.
@@ -168,10 +170,10 @@ const HoursTable: React.FC<{ hours: [Hours] | undefined }> = ({ hours }) => {
       <tbody>
         {days.map((day) => (
           <tr key={day.day}>
-            <th className="text-left py-0">{day.day}</th>
-            <td className="py-0 pl-3">
+            <th className="text-left py-0 align-top">{day.day}</th>
+            <td className="py-0 pl-3 whitespace-pre">
               {day.hourStr.length > 0 ? (
-                day.hourStr.join(`,\n`)
+                day.hourStr.join(",\n")
               ) : (
                 <span className="italic text-theme-light-gray">Closed</span>
               )}
@@ -195,9 +197,6 @@ const openMsg = (hours: Hours): string => {
   let diff = 9999999;
   const days = hours.open.filter((h) => h.day === dayOfWeek);
   if (days.length === 0) {
-    console.log(
-      `${JSON.stringify(hours)} is closed because no hrs for todays date`
-    );
     return "Closed";
   }
   let t: string | undefined = undefined;
@@ -217,7 +216,6 @@ const openMsg = (hours: Hours): string => {
   if (t) {
     return `Opens at ${t}`;
   }
-  console.log(`${JSON.stringify(hours)} is closed because its too late`);
   return "Closed";
 };
 

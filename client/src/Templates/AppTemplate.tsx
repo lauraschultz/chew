@@ -1,4 +1,5 @@
 import {
+  faBinoculars,
   faDoorOpen,
   faSearch,
   faUtensils,
@@ -15,6 +16,7 @@ import ModalContainer from "../ModalContainer";
 import Search from "../Search";
 // import { setUserName } from "../socket";
 import socket from "../socket";
+import Toast from "../Toast";
 import { UserContext, UserContextConsumer } from "../UserDataContext";
 import { UserNameModal } from "../UserNameModal";
 
@@ -33,13 +35,19 @@ const AppTemplate: React.FC = () => {
     userId,
     setUserId,
     preAuthenticated,
+    userState,
     setUserState,
+    location,
+    setLocation,
+    creatorName,
+    setCreatorName,
   } = useContext(UserContext);
   let [isAdded, setIsAdded] = useState<{ [id: string]: boolean }>({});
   let [loaded, setLoaded] = useState(false);
-  // let loaded = false;
+  let [showVotingToast, setShowVotingToast] = useState(false);
 
   useEffect(() => {
+    console.log("subscribing to socket events");
     socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
       console.log("recieving an added restaurant.");
       setAddedRestaurants((r) => ({
@@ -75,6 +83,9 @@ const AppTemplate: React.FC = () => {
         isAdded={isAdded}
         sessionId={sessionId}
         userId={userId}
+        userState={userState}
+        location={location}
+        creatorName={creatorName}
       />
     </div>
   );
@@ -110,19 +121,14 @@ const AppTemplate: React.FC = () => {
           setUserState(
             response.previouslyAuthenticated ? "canVote" : "canView"
           );
+          setLocation(response.location);
+          setCreatorName(response.creatorName);
           setAddedRestaurants(response.restaurants || {});
-          // history.push(`/ID/${match.params.sessionId}`);
+          setLoaded(true);
         } else {
           console.log("recieved failure from server");
         }
       });
-      //else redirect?????
-      // }
-      // return () => {
-      //   console.log(`loaded is true.`)
-      //   setLoaded(true);
-      // };
-      setLoaded(true);
     }
   }, [sessionId]);
 
@@ -153,13 +159,36 @@ const AppTemplate: React.FC = () => {
     <UserContextConsumer>
       {(context) => (
         <>
-          {loaded && context.userState !== "canVote" && (
+          <Toast show={showVotingToast}>
+            <div className="p-2 pt-1 md:p-3 md:pt-2 bg-gray-100 flex items-center rounded-md">
+              <FontAwesomeIcon
+                icon={faBinoculars}
+                className="flex-initial text-gray-800 p-1 pb-0"
+                size="3x"
+              />
+              <div className="flex-1 pl-3">
+                <div className="text-md font-bold border-b border-gray-400">
+                  Currently in view-only mode.
+                </div>
+                <span
+                  className="border-b-2 border-theme-blue hover:text-theme-blue cursor-pointer"
+                  onClick={() => {
+                    setShowVotingToast(false);
+                  }}
+                >
+                  Join the session
+                </span>{" "}
+                to add restaurants and vote
+              </div>
+            </div>
+          </Toast>
+          {loaded && context.userState !== "canVote" && !showVotingToast && (
             <ModalContainer>
-              <UserNameModal />
+              <UserNameModal escape={() => setShowVotingToast(true)} />
             </ModalContainer>
           )}
           <header className="bg-theme-red text-white shadow ">
-            <nav className="flex justify-between p-1 lg:p-3">
+            <nav className="flex justify-between p-1 lg:py-2 lg:px-4">
               <img
                 className="text-white inline-block w-32 lg:w-40 flex-initial"
                 src={Logo}
@@ -210,7 +239,7 @@ const AppTemplate: React.FC = () => {
                   />
                   <Route
                     path="/"
-                    render={() => <Redirect to={`/ID/${context.sessionId}"`} />}
+                    render={() => <Redirect to={`/ID/${context.sessionId}`} />}
                   />
                 </Switch>
               )}

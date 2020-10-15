@@ -54,10 +54,10 @@ export class Socket {
     this.socket = io.connect(SERVER);
   }
 
-  search = (sessionId: string, searchTerm: string): Promise<Business[]> =>
+  search = (sessionId: string, searchTerm: string, openHours:string, priceRange:string, services:string): Promise<Business[]> =>
     new Promise((resolve, reject) =>
       axios
-        .get(`${SERVER}/search/${sessionId}/${searchTerm}`)
+        .get(`${SERVER}/search/${sessionId}/${searchTerm}/${openHours}/${priceRange}/${services}`)
         .then((result) => resolve(result.data))
     );
 

@@ -9,7 +9,7 @@ import {
   NewSessionCallback,
   TryJoinSessionCallback,
   TryJoinSessionData,
-  SetUserNameData,
+  Hours,
 } from "../shared/types";
 import { firebaseConfig, yelpApiKey } from "./config";
 import { FirebaseDb, FirebaseSession, Users, Votes } from "./firebaseTypes";
@@ -28,6 +28,8 @@ let database = firebase.database(),
 
 const rootRef = database.ref();
 
+const dashReplacement = "_usedToBeADash_";
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header(
@@ -38,15 +40,24 @@ app.use(function (req, res, next) {
 });
 
 app.get(
-  "/search/:sessionId/:searchTerm",
+  "/search/:sessionId/:searchTerm/:openHours/:priceRange/:services",
   async (req: express.Request, res: express.Response) => {
-    console.log(`searching: ${JSON.stringify(req.params)}`)
-    const { sessionId, searchTerm } = req.params;
+    console.log(`searching: ${JSON.stringify(req.params)}`);
+    const {
+      sessionId,
+      searchTerm,
+      openHours,
+      priceRange,
+      services,
+    } = req.params;
     await refreshCache(sessionId);
     // console.log(`refreshed cache: ${JSON.stringify(sessionCache)}`)
     restaurantSearch(
       searchTerm,
-      sessionCache[sessionId].location || ''
+      sessionCache[sessionId].location || "",
+      openHours,
+      priceRange,
+      services
     ).then((result) => res.send(result));
   }
 );
@@ -55,14 +66,14 @@ app.post(
   "/setUserName/:sessionId/:userId/:userName",
   (req: express.Request, res: express.Response) => {
     const { sessionId, userId, userName } = req.params;
-    setUserName(sessionId, userId, userName ).then((r) => res.send(r));
+    setUserName(sessionId, userId, userName).then((r) => res.send(r));
   }
 );
 
 app.post(
   "/addVote/:sessionId/:userId/:restaurantId/:voteNum",
   (req: express.Request, res: express.Response) => {
-    const {sessionId, userId, restaurantId, voteNum} = req.params;
+    const { sessionId, userId, restaurantId, voteNum } = req.params;
     addVote(sessionId, userId, restaurantId, +voteNum);
     res.send(true);
   }
@@ -122,7 +133,7 @@ const newSession = (
       },
     })
     .then(() => callback({ success: true, sessionId, userId }))
-    .catch((e) => callback({success:false, errorMessage: e}));
+    .catch((e) => callback({ success: false, errorMessage: e }));
 };
 
 const tryJoinSession = async (
@@ -143,9 +154,11 @@ const tryJoinSession = async (
       ? true
       : false;
     console.log(`sending success callback.`);
+    const sC = sessionCache[data.sessionId]
     callback({
       success: true,
       userId: userId,
+      creatorName: sC.users[sC.creator] ? (sC.users[sC.creator]  as { name: string }).name : "Session Creator",
       previouslyAuthenticated: previouslyAuthenticated,
       restaurants: await joinRestaurants(data.sessionId),
       location: sessionCache[data.sessionId].location,
@@ -157,9 +170,13 @@ const tryJoinSession = async (
 };
 
 const setUserName = async (
-  sessionId: string, userId: string, userName: string
+  sessionId: string,
+  userId: string,
+  userName: string
 ): Promise<boolean> => {
-  console.log(`setting userName: ${JSON.stringify({sessionId, userId, userName})}`);
+  console.log(
+    `setting userName: ${JSON.stringify({ sessionId, userId, userName })}`
+  );
   await refreshCache(sessionId);
   if (!sessionCache[sessionId]) {
     // callback({ success: false });
@@ -171,10 +188,9 @@ const setUserName = async (
   await rootRef
     .child(`${sessionId}/users/${userId}`)
     .update({ name: userName })
-    .then()
-    return true;
+    .then();
+  return true;
   // callback({ success: true });
-  ;
 };
 
 const addVote = async (
@@ -185,10 +201,12 @@ const addVote = async (
 ) => {
   await refreshCache(sessionId);
   // update in cache
-  if(sessionCache[sessionId].restaurants[restaurantId]){
-    (sessionCache[sessionId].restaurants[restaurantId] as Votes)[userId] = voteNum;
+  if (sessionCache[sessionId].restaurants[restaurantId]) {
+    (sessionCache[sessionId].restaurants[restaurantId] as Votes)[
+      userId
+    ] = voteNum;
   } else {
-    sessionCache[sessionId].restaurants[restaurantId] = {[userId]: voteNum}
+    sessionCache[sessionId].restaurants[restaurantId] = { [userId]: voteNum };
   }
 
   // update in firebase
@@ -197,14 +215,15 @@ const addVote = async (
     .update({ [userId]: voteNum })
     .then(() => {
       console.log("emitting addedVote");
-  io.in(sessionId).emit("addedVote", {
-    restaurantId: restaurantId,
-    votes: shapeVotes(sessionCache[sessionId].restaurants[restaurantId], sessionCache[sessionId].users),
-  });
+      io.in(sessionId).emit("addedVote", {
+        restaurantId: restaurantId,
+        votes: shapeVotes(
+          sessionCache[sessionId].restaurants[restaurantId],
+          sessionCache[sessionId].users
+        ),
+      });
     });
-  
-
-}
+};
 
 const addRestaurant = async (
   sessionId: string,
@@ -230,8 +249,9 @@ const addRestaurant = async (
   });
 };
 
-let yelpFusion = (url: string): AxiosPromise =>
-  axios({
+let yelpFusion = (url: string): AxiosPromise => {
+  console.log(`sending ${url}`);
+  return axios({
     method: "GET",
     url: url,
     headers: {
@@ -239,10 +259,25 @@ let yelpFusion = (url: string): AxiosPromise =>
       "Content-Type": "application/json",
     },
   });
+};
+
+let yelpGql = (query: string) =>
+  axios({
+    url: "https://api.yelp.com/v3/graphql",
+    headers: {
+      Authorization: `Bearer ${yelpApiKey}`,
+      "Content-Type": "application/graphql",
+    },
+    method: "POST",
+    data: query,
+  });
 
 let getRestaurantById = (id: string): Promise<Business> =>
   new Promise((resolve, reject) =>
     yelpFusion(`https://api.yelp.com/v3/businesses/${id}`).then((result) => {
+      console.log(
+        `response from yelp api: ${result.status}, ${result.statusText}`
+      );
       if (result.status > 200 || result.status > 299) {
         console.log(`request from yelp api rejected: ${result.statusText}`);
         reject();
@@ -252,29 +287,125 @@ let getRestaurantById = (id: string): Promise<Business> =>
   );
 
 let memoizedGetRestaurantById = (id: string): Promise<Business> => {
+  console.log(`starting memoizedGetRestaurantById, id: ${id}`);
   if (restaurantCache[id]) {
     return new Promise((resolve, reject) => resolve(restaurantCache[id]));
   }
   return getRestaurantById(id);
 };
 
+let isOpenLaterToday = (business: Business): boolean => {
+  if (!business.hours[0].open) {
+    return true;
+  }
+  const currentTime = new Date();
+  const padZeros = (n: number) => ("00" + n).slice(-2);
+  const currentStringTime =
+    padZeros(currentTime.getHours()) + padZeros(currentTime.getMinutes());
+  const dayOfWeek = (((currentTime.getDay() - 1) % 6) + 6) % 6;
+  for (let h of business.hours[0].open) {
+    if (h.day === dayOfWeek) {
+      if (h.end < currentStringTime) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+//
+let getHours = (
+  businesses: Business[]
+): Promise<{ [b_id: string]: { hours: [Hours] } }> => {
+  const request = `{ 
+   ${businesses.map((b) => {
+     const newId = "b_" + b.id.replace(/-/gi, dashReplacement);
+     // console.log(`new id is ${newId}`)
+     return `
+      ${newId}: business(id: "${b.id}") {
+        hours {
+          open {
+            day
+            start
+            end
+          }
+        }
+      }`;
+   })}
+  }`;
+  // console.log(`request is ${request}`);
+  return new Promise((resolve, reject) => {
+    yelpGql(request)
+      .then(({ data }) => {
+        // console.log(`DONE ${JSON.stringify(data)}`);
+        resolve(data.data);
+      })
+      .catch((r) => {
+        console.log(`ERROR`);
+        reject();
+      });
+  });
+};
+
 let restaurantSearch = (
   searchTerm: string,
-  location: string
+  location: string,
+  openHours: string,
+  priceRange: string,
+  services: string
 ): Promise<Business[]> => {
   console.log(
-    `search request: ${searchTerm}, ${location}, restCache is ${JSON.stringify(
-      restaurantCache
-    )}`
+    `search request: ${JSON.stringify({
+      searchTerm,
+      location,
+      openHours,
+      priceRange,
+      services,
+    })}}`
   );
-  return new Promise((resolve, reject) => {
-    yelpFusion(
-      `https://api.yelp.com/v3/businesses/search?categories=restaurant&location=${location}&term=${searchTerm}`
+  return new Promise(async (resolve, reject) => {
+    let returnedBusinesses: Business[] = [];
+    await yelpFusion(
+      `https://api.yelp.com/v3/businesses/search?categories=restaurant&location=${location}&term=${searchTerm}&price=${priceRange}&open_now=${
+        openHours === "now"
+      }`
     ).then((result) => {
-      result.data.businesses.forEach((b: Business) => {
-        restaurantCache[b.id] = b;
-      });
-      resolve(result.data.businesses as Business[]);
+      returnedBusinesses = result.data.businesses || [];
+      returnedBusinesses
+        .filter((b: Business) => {
+          if (b.hours && openHours === "today") {
+            return isOpenLaterToday(b);
+          }
+        })
+        .filter((b: Business) => {
+          if (b.transactions.length === 0) {
+            return true;
+          }
+          const selectedServices = services.split(",");
+          for (let t of b.transactions) {
+            if (selectedServices.includes(t)) {
+              return true;
+            }
+          }
+          return false;
+          // return b.transactions.filter(t => services.split(",").includes(t)).length > 0
+        });
+    });
+    await getHours(returnedBusinesses).then((hours) => {
+      returnedBusinesses = returnedBusinesses.map(
+        (b) =>
+          ({
+            ...b,
+            hours: hours[`b_${b.id.replace(/-/gi, dashReplacement)}`].hours,
+          } as Business)
+      );
+    });
+    console.log(
+      `returnedbusinesses are now ${JSON.stringify(returnedBusinesses)}`
+    );
+    resolve(returnedBusinesses);
+    console.log('here:)')
+    returnedBusinesses.forEach((b: Business) => {
+      restaurantCache[b.id] = b;
     });
   });
 };
@@ -340,7 +471,8 @@ const joinRestaurants = async (
           }
         )
       )
-      .then((result: BusinessWithVotes[]) =>
+      .then((result: BusinessWithVotes[]) => {
+        console.log(`resolving all promises`);
         // {console.log(`result of promise.allsettled: ${JSON.stringify(result)}`)
         resolve(
           result
@@ -349,8 +481,8 @@ const joinRestaurants = async (
               // console.log(`reduce: cur is ${JSON.stringify(cur)}`);
               return { ...obj, [cur.business.id]: cur };
             }, {})
-        )
-      );
+        );
+      });
   });
 };
 
@@ -360,6 +492,8 @@ const shapeVotes = (votes: Votes | false, users: Users): string[] => {
     return voteArr;
   }
   Object.entries(votes).forEach(([userId, v]) => {
+    console.log(`shape votes beginning`);
+    console.log(JSON.stringify({ userId, v }));
     if (users[userId]) {
       const name = (users[userId] as { name: string }).name;
       if (voteArr[v]) {

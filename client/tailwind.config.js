@@ -12,11 +12,13 @@ module.exports = {
     extend: {
       transitionProperty: {
         spacing: "margin",
+        height: "height",
       },
       colors: {
         "theme-red": "#E8505B",
         "theme-dark-red": "#C6535B",
         "theme-yellow": "#F9D56E",
+        "theme-dark-yellow": "#F0C038",
         "theme-blue": "#14B1AB",
         "theme-light": "#F3EFDA",
         "theme-dark-gray": "#2C2921",

@@ -1,13 +1,19 @@
-import React, { useState, FormEvent, useEffect } from "react";
-import axios from "axios";
-import { SERVER } from "./config";
+import React, { useState, FormEvent } from "react";
 import { Business } from "./YelpInterfaces";
 import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faCircleNotch,
+  faInfoCircle,
+  faMapPin,
+  faPlus,
+  faSearch,
+  faSpinner,
+} from "@fortawesome/free-solid-svg-icons";
 import DisplayItem from "./DisplayItem";
 import socket from "./socket";
-import serverService from "./ServerService";
+import Filters from "./Filters";
 
 const DisplaySearchResults: React.FC<{
   businesses: Business[];
@@ -15,20 +21,15 @@ const DisplaySearchResults: React.FC<{
   isAdded: { [id: string]: boolean };
   sessionId: string;
   userId: string;
-}> = ({ businesses, voteOnRestaurant, isAdded, sessionId, userId }) => {
-  // let {sessionId, userId} = useUserData();
-  // let [displayVoteComponent, setDisplayVoteComponent] = useState<{
-  //   [id: string]: boolean;
-  // }>({});
-  // let toggle = (id: string) => {
-  //   console.log(
-  //     `changing ${id}, currently ${JSON.stringify(displayVoteComponent)}`
-  //   );
-  //   setDisplayVoteComponent((old) => ({
-  //     ...old,
-  //     [id]: !old[id],
-  //   }));
-  // };
+  userState: string;
+}> = ({
+  businesses,
+  voteOnRestaurant,
+  isAdded,
+  sessionId,
+  userId,
+  userState,
+}) => {
   return (
     <ul className="divide-y divide-theme-extra-light-gray">
       {businesses.map((b) => (
@@ -41,12 +42,14 @@ const DisplaySearchResults: React.FC<{
                 aria-label={
                   isAdded[b.id]
                     ? "restaurant has already been added"
-                    : "add restaurant"
+                    : userState === "canVote"
+                    ? "add restaurant"
+                    : "you must join the session before adding a restaurant"
                 }
                 data-balloon-pos="right"
                 className="py-1 px-2 mr-2 text-theme-med-gray border-2 border-theme-light-gray rounded-full group"
                 onClick={() => {
-                  if (!isAdded[b.id]) {
+                  if (!isAdded[b.id] && userState === "canVote") {
                     socket.addRestaurant(sessionId, userId, b.id);
                   }
                 }}
@@ -72,15 +75,34 @@ const DisplaySearchResults: React.FC<{
   );
 };
 
+export type FilterResults = {
+  openHours: "any" | "today" | "now";
+  priceRange: string;
+  services: string;
+};
+
 const Search: React.FC<{
   sessionId: string;
   userId: string;
+  location: string;
+  creatorName: string;
+  userState: string;
   voteOnRestaurant: Function;
   isAdded: { [id: string]: boolean };
-}> = ({ sessionId, userId, voteOnRestaurant, isAdded }) => {
+}> = ({
+  sessionId,
+  userId,
+  location,
+  creatorName,
+  userState,
+  voteOnRestaurant,
+  isAdded,
+}) => {
   let [searchTerm, setSearchTerm] = useState("");
   let [businesses, setBusinesses] = useState(new Array<Business>());
-  console.log(`SEARCH rerender, isAdded: ${JSON.stringify(isAdded)}`)
+  let [loadingSearch, setLoadingSearch] = useState(false);
+  let [filterResults, setFilterResults] = useState<FilterResults>();
+  console.log(`filterResults reassigned`);
 
   return (
     <div className="max-w-md w-full mx-auto">
@@ -92,11 +114,37 @@ const Search: React.FC<{
         className="p-2 w-full"
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
+          setLoadingSearch(true);
+          setBusinesses([]);
           socket
-            .search(sessionId, searchTerm)
-            .then((b: Business[]) => setBusinesses(b));
+            .search(
+              sessionId,
+              searchTerm,
+              filterResults?.openHours || "",
+              filterResults?.priceRange || "",
+              filterResults?.services || ""
+            )
+            .then((b: Business[]) => {
+              setBusinesses(b);
+              setLoadingSearch(false);
+            })
+            .catch((e) => console.log(`oopsies ${e}`));
         }}
       >
+        <div className="text-theme-light-gray italic -mt-1 mb-1">
+          {creatorName} set the location to{" "}
+          <span className="uppercase text-sm font-bold">
+            {location}
+            <button
+              type="button"
+              aria-label="Search results will not be strictly within this area; it serves as a starting point."
+              data-balloon-pos="right"
+              data-balloon-length="medium"
+            >
+              <FontAwesomeIcon icon={faInfoCircle} className="ml-1" />
+            </button>
+          </span>
+        </div>
         <input
           className="rounded py-1 px-2 shadow"
           type="text"
@@ -112,13 +160,27 @@ const Search: React.FC<{
         >
           <FontAwesomeIcon aria-label="search" icon={faSearch} />
         </button>
+        <Filters
+          update={(r: FilterResults) => {
+            console.log(`filter sent: ${JSON.stringify(r)}`);
+            setFilterResults(r);
+          }}
+        />
       </form>
+      {loadingSearch && (
+        <FontAwesomeIcon
+          icon={faCircleNotch}
+          size="5x"
+          className="animate-spin text-theme-yellow mx-auto my-4 block"
+        />
+      )}
       <DisplaySearchResults
         businesses={businesses}
         voteOnRestaurant={voteOnRestaurant}
         isAdded={isAdded}
         sessionId={sessionId}
         userId={userId}
+        userState={userState}
       />
     </div>
   );
