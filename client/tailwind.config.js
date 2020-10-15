@@ -37,6 +37,7 @@ module.exports = {
   },
   variants: {
     margin: ["responsive", "hover", "group-hover"],
+    borderColor: ['focus', 'focus-within'],
   },
   plugins: [],
 };

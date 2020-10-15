@@ -116,6 +116,7 @@ const AppTemplate: React.FC = () => {
           `response from tryJoinSession is ${JSON.stringify(response)}`
         );
         if (response.success) {
+          setShowVotingToast(false)
           setSessionId(sessionId);
           setUserId(response.userId);
           setUserState(
@@ -160,17 +161,18 @@ const AppTemplate: React.FC = () => {
       {(context) => (
         <>
           <Toast show={showVotingToast}>
-            <div className="p-2 pt-1 md:p-3 md:pt-2 bg-gray-100 flex items-center rounded-md">
+            <div className="p-2 pt-1 md:p-3 md:pt-2 bg-gray-100 flex items-center rounded-md border">
               <FontAwesomeIcon
                 icon={faBinoculars}
                 className="flex-initial text-gray-800 p-1 pb-0"
                 size="3x"
               />
               <div className="flex-1 pl-3">
-                <div className="text-md font-bold border-b border-gray-400">
+                <div className="text-md font-bold border-b border-gray-400 px-1">
                   Currently in view-only mode.
                 </div>
-                <span
+                <div className="text-gray-700 leading-tight mt-1 px-1">
+                 <span
                   className="border-b-2 border-theme-blue hover:text-theme-blue cursor-pointer"
                   onClick={() => {
                     setShowVotingToast(false);
@@ -178,7 +180,9 @@ const AppTemplate: React.FC = () => {
                 >
                   Join the session
                 </span>{" "}
-                to add restaurants and vote
+                to add restaurants and vote 
+                </div>
+                
               </div>
             </div>
           </Toast>

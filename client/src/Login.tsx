@@ -5,6 +5,7 @@ import Logo from "./assets/chew_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faInfoCircle,
+  faMapMarkerAlt,
   faMapPin,
   faPizzaSlice,
   faUser,
@@ -49,31 +50,43 @@ const Login: React.FC = () => {
           {(context) => (
             <form
               onSubmit={(e) => context.createSession(e, userName, location)}
-              className="p-3 bg-gray-100 text-gray-600 rounded my-4 shadow"
+              className="p-3 bg-gray-100 text-gray-600 rounded my-4 mx-4 lg:mx-6 shadow"
             >
               <h2 className="font-bold font-display text-xl text-gray-700 italic">
                 Create a new session:
               </h2>
               <hr />
-              <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
+              <label className="block my-2 mx-3">
                 {/* <FontAwesomeIcon icon={faUser} /> */}
-                Your name:
-                <input
-                  className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
+                <span className="uppercase font-bold text-sm">
+                 Your name: 
+                </span>
+                <div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
+                  <FontAwesomeIcon icon={faUser} className="mr-2"/>
+                  <input
+                  className="px-2 focus:outline-none border-l"
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
+                </div>
+                
               </label>
-              <label className="block my-2 mx-3 uppercase font-bold text-sm my-1">
-                {/* <FontAwesomeIcon icon={faMapPin} /> */}
-                Location:
-                <input
-                  className="py-1 px-2 mx-2 rounded bg-gray-100 border border-gray-300"
+              <label className="block my-2 mx-3">
+                {/* <FontAwesomeIcon icon={faUser} /> */}
+                <span className="uppercase font-bold text-sm">
+                 Location: 
+                </span>
+                <div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2"/>
+                  <input
+                  className="px-2 focus:outline-none border-l"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
+                </div>
+                
               </label>
               <div className="text-gray-500 italic text-sm leading-none my-2 ml-4 flex items-center">
                 <FontAwesomeIcon
@@ -86,16 +99,6 @@ const Login: React.FC = () => {
                   serves as a starting point for your search.
                 </p>
               </div>
-
-              {/* <button
-              disabled
-              aria-label="Results returned will not be strictly within this area, it serves as a starting point for your search."
-              data-balloon-pos="right"
-              data-balloon-length="medium"
-            >
-              
-            </button> */}
-
               <div className="relative overflow-hidden group text-white">
                 <button
                   type="submit"
@@ -134,7 +137,7 @@ const Login: React.FC = () => {
             </form>
           )}
         </UserContextConsumer>
-        <div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 m-2 md:m-4 rounded shadow leading-tight">
+        <div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 m-2 md:my-4 md:mx-8 rounded shadow leading-tight">
           If you are trying to join someone else's session, lorem ipsum dolor
           sit amet consectetur adipisicing elit.
         </div>

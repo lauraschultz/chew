@@ -69,11 +69,11 @@ export const DisplayItem: React.FC<{
             <div className="my-1">
               {restaurant.votes.map((v, idx) =>
                 v ? (
-                  <span className="m-1 border-theme-dark-gray rounded-sm border-2 bg-white bg-opacity-50 shadow">
+                  <span className="m-1 border-theme-dark-gray rounded-sm border bg-white bg-opacity-50 shadow">
                     <span className="bg-theme-dark-gray text-white px-1">
                       <FontAwesomeIcon icon={icons[idx].icon} />
                     </span>
-                    <span className="py-1 px-2 text-theme-dark-gray">{v}</span>
+                    <span className="px-2 text-theme-dark-gray">{v}</span>
                   </span>
                 ) : null
               )}

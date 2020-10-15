@@ -3,14 +3,19 @@ import socket from "./socket";
 import Logo from "./assets/chew_logo.svg";
 import { UserContextConsumer } from "./UserDataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
   let [currentUserName, setCurrentUserName] = useState("");
+  const keyPressEvent = (e: KeyboardEvent) => {
+    if(e.code === "Escape"){
+      escape()
+    }
+  }
   useEffect(() => {
-    window.addEventListener("keydown", escape);
+    window.addEventListener("keydown", keyPressEvent);
 
-    return () => window.removeEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", keyPressEvent);
   });
 
   return (
@@ -25,7 +30,7 @@ export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
       <UserContextConsumer>
         {(context) => (
           <form
-            className="pb-3 px-4 rounded-b bg-white text-gray-800"
+            className="pb-3 px-4 rounded-b bg-white text-gray-700"
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
               if (context.userId) {
@@ -44,18 +49,25 @@ export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
               }
             }}
           >
-            <div className="uppercase tracking-wide text-gray-600 text-xs pt-1 pb-4">
-              invited to {context.creatorName}'s session
+            <div className="text-gray-600 text-sm py-1">
+              Invited to {context.creatorName}'s session
             </div>
-            <label>
-              your name:
-              <input
-                value={currentUserName}
-                type="text"
-                onChange={(e) => setCurrentUserName(e.target.value)}
-                className="border-b-2 border-gray-600 px-1 ml-2"
-              />
-            </label>
+            <label className="block mx-3">
+                {/* <FontAwesomeIcon icon={faUser} /> */}
+                <span className="uppercase font-bold text-sm">
+                 Your name: 
+                </span>
+                <div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
+                  <FontAwesomeIcon icon={faUser} className="mr-2"/>
+                  <input
+                  className="px-2 focus:outline-none border-l"
+                  type="text"
+                  value={currentUserName}
+                  onChange={(e) => setCurrentUserName(e.target.value)}
+                />
+                </div>
+                
+              </label>
             <button
               type="submit"
               className="py-1 uppercase tracking-wide text-sm text-white bg-theme-yellow hover:theme-dark-yellow w-full mt-4 rounded shadow font-bold"
