@@ -1,5 +1,6 @@
 import {
   faBinoculars,
+  faCircleNotch,
   faDoorOpen,
   faSearch,
   faUtensils,
@@ -34,7 +35,7 @@ const AppTemplate: React.FC = () => {
     setSessionId,
     userId,
     setUserId,
-    preAuthenticated,
+    // preAuthenticated,
     userState,
     setUserState,
     location,
@@ -110,7 +111,7 @@ const AppTemplate: React.FC = () => {
   }, [addedRestaurants]);
 
   useEffect(() => {
-    if (!preAuthenticated && sessionId !== "") {
+    if (sessionId !== "") {
       socket.tryJoinSession({ sessionId, userId }, (response) => {
         console.log(
           `response from tryJoinSession is ${JSON.stringify(response)}`
@@ -160,6 +161,13 @@ const AppTemplate: React.FC = () => {
     <UserContextConsumer>
       {(context) => (
         <>
+        {!loaded && <ModalContainer shadow={false}>
+          <FontAwesomeIcon
+          icon={faCircleNotch}
+          size="5x"
+          className="animate-spin text-theme-yellow block"
+        />
+          </ModalContainer>}
           <Toast show={showVotingToast}>
             <div className="p-2 pt-1 md:p-3 md:pt-2 bg-gray-100 flex items-center rounded-md border">
               <FontAwesomeIcon
@@ -187,14 +195,14 @@ const AppTemplate: React.FC = () => {
             </div>
           </Toast>
           {loaded && context.userState !== "canVote" && !showVotingToast && (
-            <ModalContainer>
+            <ModalContainer shadow={true}>
               <UserNameModal escape={() => setShowVotingToast(true)} />
             </ModalContainer>
           )}
           <header className="bg-theme-red text-white shadow ">
             <nav className="flex justify-between p-1 lg:py-2 lg:px-4">
               <img
-                className="text-white inline-block w-32 lg:w-40 flex-initial"
+                className="text-white inline-block w-32 lg:w-38 flex-initial"
                 src={Logo}
                 alt="chew logo"
               />

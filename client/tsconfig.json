@@ -15,6 +15,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "types": ["googlemaps"],
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react"

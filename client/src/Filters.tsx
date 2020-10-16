@@ -94,7 +94,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
         <FontAwesomeIcon icon={faSlidersH} className="mr-2" />
         {showFilters ? "hide" : "show"} filters
       </button>
-      <div className={"transition-height duration-300 ease-in-out overflow-hidden p-2 flex flex-wrap border-b border-theme-extra-light-gray " + (showFilters ? "h-auto" : "h-0")}>
+      <div className={"p-2 flex flex-wrap border-b border-theme-extra-light-gray " + (showFilters ? "" : "hidden")}>
           <div className="w-full sm:w-1/2">
             <span className="text-sm font-bold uppercase tracking-wide text-theme-med-gray">
               Price Range

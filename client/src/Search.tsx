@@ -138,7 +138,7 @@ const Search: React.FC<{
             <button
               type="button"
               aria-label="Search results will not be strictly within this area; it serves as a starting point."
-              data-balloon-pos="right"
+              data-balloon-pos="down"
               data-balloon-length="medium"
             >
               <FontAwesomeIcon icon={faInfoCircle} className="ml-1" />

@@ -45,14 +45,14 @@ export const UserContextProvider: React.FC = ({children}) => {
           setCreatorName(userName);
           setUserId(response.userId);
            setUserState("canVote");
-           preAuthenticated = true;
+          //  preAuthenticated = true;
           // history.replace()
           history.push(`/ID/${response.sessionId}`);
         });
         // history.push("/home");
         // setSessionId(sessId)
       };
-    return <Provider value={{sessionId, setSessionId, userId, setUserId, userState, setUserState, createSession, preAuthenticated, location: locString, setLocation: setLocString, creatorName, setCreatorName}}>{children}</Provider>
+    return <Provider value={{sessionId, setSessionId, userId, setUserId, userState, setUserState, createSession, location: locString, setLocation: setLocString, creatorName, setCreatorName}}>{children}</Provider>
 }
 
 export {Consumer as UserContextConsumer};

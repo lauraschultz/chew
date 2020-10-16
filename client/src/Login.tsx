@@ -13,6 +13,7 @@ import {
 // import { newSession } from "./socket";
 import socket from "./socket";
 import { UserContextConsumer } from "./UserDataContext";
+import PlacesAutocomplete from "./PlacesAutocomplete";
 
 const Login: React.FC = () => {
   let [userName, setUserName] = useState(""),
@@ -85,6 +86,7 @@ const Login: React.FC = () => {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
+                <PlacesAutocomplete searchTerm={location} selectPlace={(place) => setLocation(place)}/>
                 </div>
                 
               </label>

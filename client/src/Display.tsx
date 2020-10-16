@@ -15,7 +15,7 @@ const Display: React.FC<{
         Restaurants
       </h2>
       {Object.keys(addedRestaurants).length === 0 && (
-        <div className="text-theme-light-gray py-2 px-4 rounded my-3 border border-theme-light-gray italic text-sm">
+        <div className="text-theme-light-gray py-2 px-4 rounded my-3 border border-theme-light-gray italic text-sm mx-auto max-w-md">
           No restaurants have been added
         </div>
       )}

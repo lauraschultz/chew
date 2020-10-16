@@ -47,7 +47,7 @@ export const DisplayItem: React.FC<{
         <h2 className="leading-tight font-display italic font-bold text-xl text-theme-dark-gray">
           {restaurant.business.name}
           {restaurant.business.price && (
-            <span className="ml-2 px-1 rounded bg-theme-med-gray text-white text-sm">
+            <span className="ml-2 px-1 pt-1 rounded bg-theme-light-gray text-white text-sm">
               {restaurant.business.price.split("").map((_) => (
                 <FontAwesomeIcon icon={faDollarSign} />
               ))}
