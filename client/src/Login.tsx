@@ -1,42 +1,19 @@
 import React, { useState, FormEvent } from "react";
-import { useHistory } from "react-router-dom";
 import IceCreamGirl from "./assets/ice_cream_girl.svg";
 import Logo from "./assets/chew_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faInfoCircle,
   faMapMarkerAlt,
-  faMapPin,
   faPizzaSlice,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-// import { newSession } from "./socket";
-import socket from "./socket";
 import { UserContextConsumer } from "./UserDataContext";
 import PlacesAutocomplete from "./PlacesAutocomplete";
 
 const Login: React.FC = () => {
   let [userName, setUserName] = useState(""),
     [location, setLocation] = useState("");
-    // {
-    //   sessionId,
-    //   setSessionId,
-    //   userId,
-    //   setUserId,
-    //   setUserState,
-    // } = useUserData();
-  // [sessionId, setSessionId] = useState("");
-
-  // let history = useHistory();
-
-  
-
-  // let join = (e: FormEvent) => {
-  //   e.preventDefault();
-  //   console.log(`join session, username is ${userName}`);
-  //   joinSession({ sessionId, userName });
-  //   // history.push("/home");
-  // };
   return (
     <>
       <div className="flex-1 py-2 px-4 md:px-6 bg-theme-red text-gray-200 rounded-lg shadow-lg max-w-lg md:m-2 lg:mr-6">
@@ -59,36 +36,37 @@ const Login: React.FC = () => {
               <hr />
               <label className="block my-2 mx-3">
                 {/* <FontAwesomeIcon icon={faUser} /> */}
-                <span className="uppercase font-bold text-sm">
-                 Your name: 
-                </span>
+                <span className="uppercase font-bold text-sm">Your name:</span>
                 <div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
-                  <FontAwesomeIcon icon={faUser} className="mr-2"/>
+                  <FontAwesomeIcon icon={faUser} className="mr-2" />
                   <input
-                  className="px-2 focus:outline-none border-l"
-                  type="text"
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                />
+                    className="px-2 focus:outline-none border-l"
+                    type="text"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                  />
                 </div>
-                
               </label>
               <label className="block my-2 mx-3">
                 {/* <FontAwesomeIcon icon={faUser} /> */}
-                <span className="uppercase font-bold text-sm">
-                 Location: 
-                </span>
-                <div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
-                  <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2"/>
+                <span className="uppercase font-bold text-sm">Location:</span>
+                <div
+                  className={
+                    "py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content "
+                  }
+                >
+                  <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
                   <input
-                  className="px-2 focus:outline-none border-l"
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-                <PlacesAutocomplete searchTerm={location} selectPlace={(place) => setLocation(place)}/>
+                    className="px-2 focus:outline-none border-l"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
                 </div>
-                
+                <PlacesAutocomplete
+                  searchTerm={location}
+                  selectPlace={(place) => setLocation(place)}
+                />
               </label>
               <div className="text-gray-500 italic text-sm leading-none my-2 ml-4 flex items-center">
                 <FontAwesomeIcon
@@ -148,19 +126,6 @@ const Login: React.FC = () => {
       <div className="flex-1 hidden md:inline max-w-lg">
         <img src={IceCreamGirl} />
       </div>
-
-      {/* <form onSubmit={join}>
-        <h2>Join someone else's session:</h2>
-        <label>
-          Session ID:
-          <input
-            type="text"
-            value={sessionId}
-            onChange={(e) => setSessionId(e.target.value)}
-          />
-        </label>
-        <button type="submit">join</button>
-      </form> */}
     </>
   );
 };
