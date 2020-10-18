@@ -72,18 +72,18 @@ app.post(
 
 app.post(
   "/addVote/:sessionId/:userId/:restaurantId/:voteNum",
-  (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response) => {
     const { sessionId, userId, restaurantId, voteNum } = req.params;
-    addVote(sessionId, userId, restaurantId, +voteNum);
+    await addVote(sessionId, userId, restaurantId, +voteNum);
     res.send(true);
   }
 );
 
 app.post(
   "/addRestaurant/:sessionId/:userId/:restaurantId",
-  (req: express.Request, res: express.Response) => {
+  async (req: express.Request, res: express.Response) => {
     const { sessionId, userId, restaurantId } = req.params;
-    addRestaurant(sessionId, userId, restaurantId);
+    await addRestaurant(sessionId, userId, restaurantId);
     res.send(true);
   }
 );

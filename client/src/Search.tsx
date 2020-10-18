@@ -14,6 +14,7 @@ import {
 import DisplayItem from "./DisplayItem";
 import socket from "./socket";
 import Filters from "./Filters";
+import AddRestaurantButton from "./AddRestaurantButton";
 
 const DisplaySearchResults: React.FC<{
   businesses: Business[];
@@ -36,30 +37,7 @@ const DisplaySearchResults: React.FC<{
         <li key={b.id}>
           <DisplayItem
             restaurant={{ business: b, votes: [] }}
-            addRestaurant={
-              <button
-                // title={displayVoteComponent[b.id] ? "you have already added" : "add this restaurant"}
-                aria-label={
-                  isAdded[b.id]
-                    ? "restaurant has already been added"
-                    : userState === "canVote"
-                    ? "add restaurant"
-                    : "you must join the session before adding a restaurant"
-                }
-                data-balloon-pos="right"
-                className="py-1 px-2 mr-2 text-theme-med-gray border-2 border-theme-light-gray rounded-full group"
-                onClick={() => {
-                  if (!isAdded[b.id] && userState === "canVote") {
-                    socket.addRestaurant(sessionId, userId, b.id);
-                  }
-                }}
-              >
-                <FontAwesomeIcon icon={isAdded[b.id] ? faCheck : faPlus} />
-                {/* <span className="hidden hover:block absolute">
-                <Tooltip>{displayVoteComponent[b.id] ? <p>you have already added</p> : <p>add this restaurant</p>}</Tooltip>
-              </span> */}
-              </button>
-            }
+            addRestaurant={<AddRestaurantButton isRestaurantsAdded={isAdded[b.id]} userState={userState} sessionId={sessionId} userId={userId} businessId={b.id}/>}
             vote={
               isAdded[b.id] ? (
                 <Vote

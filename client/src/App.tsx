@@ -115,15 +115,6 @@ const App: React.FC = () => {
               
           )}
         ></Route>
-        {/* <Route path="/ID/:sessionId/search" exact>
-          <AppTemplate>
-            <Search
-              search={search}
-              addRestaurant={addRestaurant}
-              voteOnRestaurant={voteOnRestaurant}
-            />
-          </AppTemplate>
-        </Route> */}
         <Route path="/404" exact >
           <FourOhFour />
         </Route>
