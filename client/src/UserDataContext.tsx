@@ -25,6 +25,21 @@ export const UserContextProvider: React.FC = ({children}) => {
     let location = useLocation();
 
     useEffect(() => {
+      console.log(`useeffect`);
+      const sUserId = localStorage.getItem("chewUserId");
+      if (sUserId) {
+        setUserId(sUserId);
+      }
+    }, []);
+  
+    useEffect(() => {
+      if (userId) {
+        console.log(`setting localStorage`);
+        localStorage.setItem("chewUserId", userId);
+      }
+    }, [userId]);
+
+    useEffect(() => {
       console.log(`location useEffect`);
       const match = matchPath<{ sessionId: string }>(location.pathname, {
         path: "/ID/:sessionId",
@@ -45,9 +60,9 @@ export const UserContextProvider: React.FC = ({children}) => {
           setCreatorName(userName);
           setUserId(response.userId);
            setUserState("canVote");
-          //  preAuthenticated = true;
-          // history.replace()
           history.push(`/ID/${response.sessionId}`);
+          window.history.replaceState({fromLogin: true}, "")
+          console.log(`window.history.state: ${JSON.stringify(window.history.state)}`)
         });
         // history.push("/home");
         // setSessionId(sessId)

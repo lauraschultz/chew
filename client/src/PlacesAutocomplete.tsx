@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import { googleCloudApiKey } from "./config";
-import { rejects } from "assert";
 import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 
 interface PlacesSearchResult {
@@ -45,7 +43,6 @@ const PlacesAutocomplete: React.FC<{
   let scriptLoaded = useRef(false);
   let selectedText = useRef<string>();
   const ref = useClickOutsideListenerRef(() => setCurrentSearchResults([]));
-  console.log(`re-render`);
 
   const handleScriptLoad = () => {
     autoComplete = new window.google.maps.places.AutocompleteService();
@@ -102,12 +99,10 @@ const PlacesAutocomplete: React.FC<{
     searchTerm &&
     Math.abs(searchTerm.length - currentSearchTerm.current.length) > 1
   ) {
-    console.log(`setting current search term to ${searchTerm}`);
     currentSearchTerm.current = searchTerm;
     autoComplete.getPlacePredictions(
       { input: searchTerm, types: ["(regions)"] },
       (result, status) => {
-        console.log(`result is ${JSON.stringify(result)}`);
         setCurrentSearchResults(result || []);
       }
     );
@@ -143,7 +138,7 @@ const PlacesAutocomplete: React.FC<{
         </li>
       ))}
       {currentSearchResults.length > 0 && (
-        <img src={poweredByGoogle} className="float-right px-2 py-1 w-38" />
+        <img src={poweredByGoogle} alt="powered by Google" className="float-right px-2 py-1 w-38" />
       )}
     </ul>
   );

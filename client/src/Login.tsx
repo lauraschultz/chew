@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 import IceCreamGirl from "./assets/ice_cream_girl.svg";
 import Logo from "./assets/chew_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   return (
     <>
       <div className="flex-1 py-2 px-4 md:px-6 bg-theme-red text-gray-200 rounded-lg shadow-lg max-w-lg md:m-2 lg:mr-6">
-        <img className="w-40" src={Logo} />
+        <img className="w-40" src={Logo} alt="chew logo"/>
         <p className="font-display text-lg leading-tight py-1">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime magnam
           minus rem quasi eum doloremque autem, unde recusandae quia cum,
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
       </div>
 
       <div className="flex-1 hidden md:inline max-w-lg">
-        <img src={IceCreamGirl} />
+        <img src={IceCreamGirl} alt="girl holding a giant ice cream cone"/>
       </div>
     </>
   );

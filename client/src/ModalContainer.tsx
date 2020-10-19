@@ -1,5 +1,4 @@
 import React from "react";
-import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 
 const ModalContainer: React.FC<{shadow: boolean}> = ({ shadow, children }) => {
   return (

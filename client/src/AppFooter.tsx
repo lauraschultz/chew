@@ -5,9 +5,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import CopySessionUrl from "./CopySessionUrl";
 
-const Footer: React.FC = () => (
-  <footer className="text-theme-red w-full">
+const AppFooter: React.FC = () => <footer className="text-theme-red w-full">
       <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 818 55"  xmlns="http://www.w3.org/2000/svg">
 <path d="M-6.10352e-05 13.9999C61 13 67 54 158 55C249 56 360 2.00001 476 1.00001C592 6.17467e-06 580 43.9999 665 43.9999C750 43.9999 762 12 818 13.9999V55H-6.10352e-05V13.9999Z" fill="currentColor"/>
 </svg>
@@ -21,9 +22,14 @@ const Footer: React.FC = () => (
     </svg> */}
     <div className="bg-theme-red text-white p-2 md:px-8 md:py-4 lg:px-24 block md:flex justify-around leading-tight">
       <div className="flex-1">
-        <p>
+        <p className="mb-1">Share this session with others:</p>
+        <CopySessionUrl buttonThemes='bg-white text-theme-red border-white' buttonShadowColor="#e8505b" inputThemes="border-white bg-theme-red"/>
+        
+      </div>
+      <div className="flex-1">
+      <p>
           <FontAwesomeIcon icon={faCopyright} size="sm" className="mr-2" />
-          <a href="" target="_blank">
+          <a href="http://lauraschultz.dev" target="_blank" rel="noopener noreferrer">
             Laura Schultz
           </a>{" "}
           2020
@@ -32,22 +38,20 @@ const Footer: React.FC = () => (
           className="block"
           href="http://github.com/lauraschultz/chew"
           target="_blank"
+          rel="noopener noreferrer"
         >
           <FontAwesomeIcon icon={faStar} size="sm" className="mr-2" />
           star on Github
         </a>
-      </div>
-      <div className="flex-1">
-        <a className="block">
+        <Link to='/'>
           <FontAwesomeIcon icon={faFileSignature} size="sm" className="mr-2" />
           terms of use & privacy policy
-        </a>
+          </Link>
       </div>
 
       {/* <Link to="">show restaurants</Link>
           <Link to="">show search</Link> */}
     </div>
   </footer>
-);
 
-export default Footer;
+export default AppFooter;

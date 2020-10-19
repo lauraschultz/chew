@@ -80,7 +80,6 @@ const Search: React.FC<{
   let [businesses, setBusinesses] = useState(new Array<Business>());
   let [loadingSearch, setLoadingSearch] = useState(false);
   let [filterResults, setFilterResults] = useState<FilterResults>();
-  console.log(`filterResults reassigned`);
 
   return (
     <div className="max-w-md w-full mx-auto">
@@ -127,10 +126,7 @@ const Search: React.FC<{
           className="rounded py-1 px-2 shadow"
           type="text"
           value={searchTerm}
-          onChange={(e) => {
-            console.log("setting");
-            setSearchTerm(e.target.value);
-          }}
+          onChange={(e) => setSearchTerm(e.target.value)}
         ></input>
         <button
           className="shadow py-1 px-2 ml-2 text-white bg-theme-blue rounded-full"

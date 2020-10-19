@@ -39,7 +39,6 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
   // let [onlyOnePriceSet, setOnlyOnePriceSet] = useState(false);
   useEffect(() => {
     onlyOnePriceSet = !(state.prices[0]! > -1 && state.prices[1]! > -1);
-    console.log(`onlyonepriceset is ${onlyOnePriceSet}`);
   }, [state.prices]);
 
   const min = (arr: (number | undefined)[]) => {
@@ -49,7 +48,6 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
         min = n;
       }
     });
-    console.log(`the min of ${arr} is ${min}.`);
     return min;
   };
 
@@ -126,7 +124,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
             </span>
             <label className="block px-2">
               <input
-                className="mr-2"
+                className="mr-1"
                 checked={state.openDate === "any"}
                 type="radio"
                 name="day"
@@ -136,7 +134,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
             </label>
             <label className="block px-2">
               <input
-                className="mr-2"
+                className="mr-1"
                 checked={state.openDate === "today"}
                 type="radio"
                 name="day"
@@ -145,7 +143,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
               Today
               <label className="block px-4 -mt-1 mb-2">
                 <input
-                  className="mr-2"
+                  className="mr-1"
                   checked={state.openNow}
                   type="checkbox"
                   onChange={() => dispatch({ key: "openNow" })}
@@ -160,7 +158,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
             </span>
             <label className="block px-2">
               <input
-                className="mr-2"
+                className="mr-1"
                 checked={state.services.pickup}
                 type="checkbox"
                 onChange={() => dispatch({ key: "pickup" })}
@@ -169,7 +167,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
             </label>
             <label className="block px-2">
               <input
-                className="mr-2"
+                className="mr-1"
                 checked={state.services.delivery}
                 type="checkbox"
                 onChange={() => dispatch({ key: "delivery" })}
@@ -178,7 +176,7 @@ const Filters: React.FC<{ update: (newFilters: FilterResults) => void }> = ({
             </label>
             <label className="block px-2">
               <input
-                className="mr-2"
+                className="mr-1"
                 checked={state.services.restaurant_reservation}
                 type="checkbox"
                 onChange={() => dispatch({ key: "restaurant_reservation" })}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const Toast: React.FC<{ show: boolean }> = ({show, children}) => {
   console.log(`Toast: show is ${show}`)

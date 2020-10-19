@@ -1,35 +1,23 @@
 import React, { useState, FormEvent, useEffect } from "react";
 import socket from "./socket";
-import Logo from "./assets/chew_logo.svg";
+
 import { UserContextConsumer } from "./UserDataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
+import ModalWelcomeHeader from "./ModalWelcomeHeader";
+import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 
 export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
   let [currentUserName, setCurrentUserName] = useState("");
-  const keyPressEvent = (e: KeyboardEvent) => {
-    if(e.code === "Escape"){
-      escape()
-    }
-  }
-  useEffect(() => {
-    window.addEventListener("keydown", keyPressEvent);
-
-    return () => window.removeEventListener("keydown", keyPressEvent);
-  });
+ let ref = useClickOutsideListenerRef(escape);
 
   return (
     <>
-      <div className="p-2 text-white bg-gradient-to-r from-theme-red to-theme-dark-red rounded-t font-bold text-xl">
-        <span className="">Welcome to</span>
-        <img className="inline w-24 ml-1" src={Logo} />
-        <button className="float-right leading-none" onClick={escape}>
-          <FontAwesomeIcon icon={faTimes} />
-        </button>
-      </div>
+      <ModalWelcomeHeader escape={escape} />
       <UserContextConsumer>
         {(context) => (
           <form
+          ref={ref}
             className="pb-3 px-4 rounded-b bg-white text-gray-700"
             onSubmit={(e: FormEvent) => {
               e.preventDefault();

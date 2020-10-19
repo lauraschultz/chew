@@ -10,8 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ReactNode, useContext, useState } from "react";
-import { UserContext } from "./UserDataContext";
-import Vote from "./Vote";
 import { icons } from "./VotingIcons";
 import { BusinessWithVotes, Hours } from "./YelpInterfaces";
 
@@ -126,6 +124,7 @@ export const DisplayItem: React.FC<{
                     className="block text-center rounded w-full py-1 px-3 bg-theme-red text-white font-bold italic mt-3"
                     href={restaurant.business.url}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     more info
                     <FontAwesomeIcon

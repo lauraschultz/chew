@@ -1,5 +1,5 @@
 import React from "react";
-import Footer from "../Footer";
+import AppFooter from "../AppFooter";
 
 const LoginTemplate: React.FC = ({ children }) => {
   return (
@@ -10,7 +10,7 @@ const LoginTemplate: React.FC = ({ children }) => {
 
       
 
-      <Footer />
+      {/* <AppFooter /> */}
     </>
   );
 };
