@@ -1,9 +1,9 @@
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent } from "react";
 import socket from "./socket";
 
 import { UserContextConsumer } from "./UserDataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import ModalWelcomeHeader from "./ModalWelcomeHeader";
 import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import AppFooter from "../AppFooter";
+import LoginFooter from "../LoginFooter";
 
 const LoginTemplate: React.FC = ({ children }) => {
   return (
@@ -7,10 +7,7 @@ const LoginTemplate: React.FC = ({ children }) => {
       <main className="flex-grow flex justify-center w-screen items-center">
         {children}
       </main>
-
-      
-
-      {/* <AppFooter /> */}
+      <LoginFooter />
     </>
   );
 };

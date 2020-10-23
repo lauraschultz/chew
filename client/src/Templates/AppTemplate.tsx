@@ -15,25 +15,25 @@ import {
   Route,
   Switch,
   useHistory,
-  useLocation,
 } from "react-router-dom";
-import { BusinessWithVotes } from "../../../shared/types";
+import { Business, BusinessWithVotes } from "../../../shared/types";
 import Logo from "../assets/chew_logo.svg";
 import Display from "../Display";
 import AppFooter from "../AppFooter";
 import ModalContainer from "../ModalContainer";
 import Search from "../Search";
 import ShareSessionModal from "../ShareSessionModal";
-// import { setUserName } from "../socket";
 import socket from "../socket";
 import Toast from "../Toast";
 import { UserContext, UserContextConsumer } from "../UserDataContext";
 import { UserNameModal } from "../UserNameModal";
+import { FilterForm } from "../YelpInterfaces";
 
-// interface Props extends RouteComponentProps<{ sessionId: string }> {
-//   search: ReactFragment;
-//   display: ReactFragment;
-// }
+export interface SearchFormState {
+  search: string;
+  filter: FilterForm;
+  results: Business[];
+}
 
 const AppTemplate: React.FC = () => {
   let [addedRestaurants, setAddedRestaurants] = useState<{
@@ -44,23 +44,25 @@ const AppTemplate: React.FC = () => {
     setSessionId,
     userId,
     setUserId,
-    // preAuthenticated,
     userState,
     setUserState,
     location,
     setLocation,
     creatorName,
     setCreatorName,
+    setPreviousVotes,
   } = useContext(UserContext);
   let [isAdded, setIsAdded] = useState<{ [id: string]: boolean }>({});
   let [loaded, setLoaded] = useState(false);
   let [showVotingToast, setShowVotingToast] = useState(false);
   let [showShareSessionModal, setShowShareSessionModal] = useState(false);
-  let appLoc = useLocation();
+  let [searchFormState, setSearchFormState] = useState<
+    Partial<SearchFormState>
+  >({});
   let history = useHistory();
 
+
   useEffect(() => {
-    console.log("subscribing to socket events");
     socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
       console.log("recieving an added restaurant.");
       setAddedRestaurants((r) => ({
@@ -95,10 +97,12 @@ const AppTemplate: React.FC = () => {
         voteOnRestaurant={voteOnRestaurant}
         isAdded={isAdded}
         sessionId={sessionId}
-        userId={userId}
-        userState={userState}
         location={location}
         creatorName={creatorName}
+        searchFormState={searchFormState}
+        updateSearchFormState={(s: Partial<SearchFormState>) =>
+          setSearchFormState((old) => ({ ...old, ...s }))
+        }
       />
     </div>
   );
@@ -113,21 +117,23 @@ const AppTemplate: React.FC = () => {
   );
 
   useEffect(() => {
-    console.log(`updating isAdded.`);
     const newIsAdded: { [id: string]: boolean } = {};
     Object.keys(addedRestaurants).forEach(
       (restId) => (newIsAdded[restId] = true)
     );
     setIsAdded(newIsAdded);
-    // console.log(`isAdded: ${JSON.stringify(isAdded)}`)
   }, [addedRestaurants]);
 
   useEffect(() => {
-    if (window.history.state.fromLogin) {
-      console.log(`LOGIN`);
+    if (window.history?.state?.fromLogin) {
+      console.log(`REDIRECTED FROM LOGIN`);
       setShowShareSessionModal(true);
       setLoaded(true);
-      window.history.replaceState({fromLogin: false}, "")
+
+      // history.replace(history.location, {fromLogin:false})
+      // appLoc.state = {fromLogin:false}
+
+      window.history.replaceState({ fromLogin: false }, "");
     } else if (sessionId !== "") {
       socket.tryJoinSession({ sessionId, userId }, (response) => {
         console.log(
@@ -142,14 +148,16 @@ const AppTemplate: React.FC = () => {
           );
           setLocation(response.location);
           setCreatorName(response.creatorName);
+          setPreviousVotes(response.previousVotes);
           setAddedRestaurants(response.restaurants || {});
           setLoaded(true);
         } else {
+          history.push("/404");
           console.log("recieved failure from server");
         }
       });
     }
-  }, [sessionId]);
+  }, [sessionId]); //sessionId
 
   return (
     <>
@@ -202,11 +210,13 @@ const AppTemplate: React.FC = () => {
             )}
             <header className="bg-theme-red text-white shadow ">
               <nav className="flex justify-between p-1 lg:py-2 lg:px-4">
-                <img
-                  className="text-white inline-block w-32 lg:w-38 flex-initial"
-                  src={Logo}
-                  alt="chew logo"
-                />
+                <Link to="/getStarted">
+                  <img
+                    className="text-white inline-block w-32 lg:w-38 flex-initial"
+                    src={Logo}
+                    alt="chew logo"
+                  />
+                </Link>
                 <Link
                   to="/getStarted"
                   className="inline-block flex-initial self-center text-sm"
@@ -268,6 +278,23 @@ const AppTemplate: React.FC = () => {
               <Media
                 query="(max-width: 767px)"
                 render={() => (
+                  <Route
+                    path="/ID/:sessionId"
+                    render={({ location }) => (
+                      // <div className="w-screen overflow-x-hidden">
+                      //   <div
+                      //     className={"whitespace-no-wrap transition-spacing " + (location.pathname.search("search") > -1 ? '-ml-screen': 'm-0')}
+                      //     // style={
+                      //     //   location.pathname.search("search") > -1
+                      //     //     ? { marginLeft: "-100vw" }
+                      //     //     : { marginLeft: "0" }
+                      //     // }
+                      //   >
+                      //     <div className="w-screen inline-block">{display}</div>
+                      //     <div className="w-screen inline-block">{search}</div>
+                      //   </div>
+                      // </div>
+                    
                   <Switch>
                     <Route path="/ID/:sessionId" exact render={() => display} />
                     <Route
@@ -276,10 +303,11 @@ const AppTemplate: React.FC = () => {
                       render={() => search}
                     />
                   </Switch>
+                  )}
+                  />
                 )}
               />
             </main>
-            {/* {children} */}
             <AppFooter />
           </>
         )}

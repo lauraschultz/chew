@@ -1,14 +1,16 @@
-import React, {  } from "react";
+import React, { useContext } from "react";
 import { BusinessWithVotes } from "./YelpInterfaces";
 import Vote from "./Vote";
 import DisplayItem from "./DisplayItem";
+import { UserContext } from "./UserDataContext";
 // import { matchPath, RouteComponentProps, useParams } from "react-router-dom";
 
 const Display: React.FC<{
   voteOnRestaurant: Function;
-  addedRestaurants: {[id:string]:BusinessWithVotes}
+  addedRestaurants: { [id: string]: BusinessWithVotes };
+  // previousVotes: {[restaurantId:string]: number}
 }> = ({ voteOnRestaurant, addedRestaurants }) => {
-
+  let { previousVotes, setPreviousVotes } = useContext(UserContext);
   return (
     <div className="divide-y divide-theme-extra-light-gray">
       <h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none -mb-1">
@@ -25,10 +27,14 @@ const Display: React.FC<{
           restaurant={r}
           vote={
             <Vote
-              currentVote={undefined}
-              addVote={(voteNum: number) =>
-                voteOnRestaurant(r.business.id, voteNum)
-              }
+              currentVote={previousVotes[r.business.id]}
+              addVote={(voteNum: number) => {
+                voteOnRestaurant(r.business.id, voteNum);
+                setPreviousVotes((old: { [restaurantId: string]: number }) => ({
+                  ...old,
+                  [r.business.id]: voteNum,
+                }));
+              }}
             />
           }
         />

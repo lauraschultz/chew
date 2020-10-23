@@ -10,6 +10,10 @@ module.exports = {
       body: "Lato",
     },
     extend: {
+      spacing: {
+        'xs': '.08rem',
+        '-screen': '-100vw'
+      },
       transitionProperty: {
         spacing: "margin",
         height: "height",

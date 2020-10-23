@@ -64,10 +64,11 @@ export interface TryJoinSessionData {
 export type TryJoinSessionCallback = (params: {
   success: boolean;
   userId?: string;
-  creatorName?:string;
+  creatorName?: string;
   previouslyAuthenticated?: boolean;
   restaurants?: { [id: string]: BusinessWithVotes };
   location?: string;
+  previousVotes?: { [restaurantId: string]: number };
 }) => void;
 
 export interface SetUserNameData {

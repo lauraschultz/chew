@@ -1,48 +1,59 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext, useEffect } from "react";
 import { Business } from "./YelpInterfaces";
 import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCheck,
   faCircleNotch,
   faInfoCircle,
-  faMapPin,
-  faPlus,
   faSearch,
-  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import DisplayItem from "./DisplayItem";
 import socket from "./socket";
 import Filters from "./Filters";
 import AddRestaurantButton from "./AddRestaurantButton";
+import { UserContext } from "./UserDataContext";
+import { SearchFormState } from "./Templates/AppTemplate";
 
 const DisplaySearchResults: React.FC<{
   businesses: Business[];
   voteOnRestaurant: Function;
   isAdded: { [id: string]: boolean };
-  sessionId: string;
-  userId: string;
-  userState: string;
-}> = ({
-  businesses,
-  voteOnRestaurant,
-  isAdded,
-  sessionId,
-  userId,
-  userState,
-}) => {
+}> = ({ businesses, voteOnRestaurant, isAdded }) => {
+  let {
+    sessionId,
+    userId,
+    userState,
+    previousVotes,
+    setPreviousVotes,
+  } = useContext(UserContext);
   return (
     <ul className="divide-y divide-theme-extra-light-gray">
       {businesses.map((b) => (
         <li key={b.id}>
           <DisplayItem
             restaurant={{ business: b, votes: [] }}
-            addRestaurant={<AddRestaurantButton isRestaurantsAdded={isAdded[b.id]} userState={userState} sessionId={sessionId} userId={userId} businessId={b.id}/>}
+            addRestaurant={
+              <AddRestaurantButton
+                isRestaurantsAdded={isAdded[b.id]}
+                userState={userState}
+                sessionId={sessionId}
+                userId={userId}
+                businessId={b.id}
+              />
+            }
             vote={
               isAdded[b.id] ? (
                 <Vote
-                  currentVote={undefined}
-                  addVote={(v: number) => voteOnRestaurant(b.id, v)}
+                  currentVote={previousVotes[b.id]}
+                  addVote={(v: number) => {
+                    voteOnRestaurant(b.id, v);
+                    setPreviousVotes(
+                      (old: { [restaurantId: string]: number }) => ({
+                        ...old,
+                        [b.id]: v,
+                      })
+                    );
+                  }}
                 />
               ) : null
             }
@@ -61,25 +72,34 @@ export type FilterResults = {
 
 const Search: React.FC<{
   sessionId: string;
-  userId: string;
   location: string;
   creatorName: string;
-  userState: string;
   voteOnRestaurant: Function;
   isAdded: { [id: string]: boolean };
+  searchFormState: Partial<SearchFormState>;
+  updateSearchFormState: (s: Partial<SearchFormState>) => void
 }> = ({
   sessionId,
-  userId,
   location,
   creatorName,
-  userState,
   voteOnRestaurant,
   isAdded,
+  searchFormState,
+  updateSearchFormState
 }) => {
-  let [searchTerm, setSearchTerm] = useState("");
-  let [businesses, setBusinesses] = useState(new Array<Business>());
+  console.log(`SEARCH COMPONENT: searchFormState is ${JSON.stringify(searchFormState)}`)
+  let [searchTerm, setSearchTerm] = useState(searchFormState.search || "");
+  let [businesses, setBusinesses] = useState(searchFormState.results || new Array<Business>());
   let [loadingSearch, setLoadingSearch] = useState(false);
   let [filterResults, setFilterResults] = useState<FilterResults>();
+
+  useEffect(() => {
+    updateSearchFormState({search: searchTerm})
+  }, [searchTerm])
+
+  useEffect(() => {
+    updateSearchFormState({results: businesses})
+  }, [businesses])
 
   return (
     <div className="max-w-md w-full mx-auto">
@@ -108,7 +128,7 @@ const Search: React.FC<{
             .catch((e) => console.log(`oopsies ${e}`));
         }}
       >
-        <div className="text-theme-light-gray italic -mt-1 mb-1">
+        <div className="text-theme-light-gray italic -mt-1">
           {creatorName} set the location to{" "}
           <span className="uppercase text-sm font-bold">
             {location}
@@ -123,13 +143,13 @@ const Search: React.FC<{
           </span>
         </div>
         <input
-          className="rounded py-1 px-2 shadow"
+          className="rounded py-1 px-2 shadow m-1"
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         ></input>
         <button
-          className="shadow py-1 px-2 ml-2 text-white bg-theme-blue rounded-full"
+          className="shadow py-1 px-2 m-1 text-white bg-theme-blue rounded-full"
           type="submit"
         >
           <FontAwesomeIcon aria-label="search" icon={faSearch} />
@@ -139,6 +159,8 @@ const Search: React.FC<{
             console.log(`filter sent: ${JSON.stringify(r)}`);
             setFilterResults(r);
           }}
+          updateSearchFormFilterState={(f) => updateSearchFormState({filter: f})}
+          searchFormFilterState={searchFormState.filter}
         />
       </form>
       {loadingSearch && (
@@ -152,9 +174,6 @@ const Search: React.FC<{
         businesses={businesses}
         voteOnRestaurant={voteOnRestaurant}
         isAdded={isAdded}
-        sessionId={sessionId}
-        userId={userId}
-        userState={userState}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { icons } from "./VotingIcons";
 import { UserContext } from "./UserDataContext";
+import Corner from "./assets/corner.svg";
 
 const Vote: React.FC<{
   addVote: Function;
@@ -11,7 +12,6 @@ const Vote: React.FC<{
   if (userState === "canView") {
     return null;
   }
-
   return (
     <form
       className="flex items-center justify-center"
@@ -23,14 +23,29 @@ const Vote: React.FC<{
       {icons.map((i, idx) => (
         <button
           key={idx}
+          className="p-xs m-xs"
           // className={"fa-layers fa-fw fa-2x m-1"}
-          className={"p-1 " + (currentVote===idx ? "border rounded-full" + i.borderColor: "")}
           onClick={() => addVote(idx)}
           aria-label={i.descText}
           data-balloon-pos="down"
         >
           <div className="leading-none bg-white rounded-full">
             <FontAwesomeIcon className={i.color} icon={i.icon} size="2x" />
+          </div>
+          <div className={currentVote === idx ? "" : "hidden"}>
+            <img src={Corner} className="absolute top-0 left-0" />
+            <img
+              src={Corner}
+              className="absolute top-0 right-0 transform rotate-90"
+            />
+            <img
+              src={Corner}
+              className="absolute bottom-0 right-0 transform rotate-180"
+            />
+            <img
+              src={Corner}
+              className="absolute bottom-0 left-0 transform -rotate-90"
+            />
           </div>
 
           {/* <FontAwesomeIcon

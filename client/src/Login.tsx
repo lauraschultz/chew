@@ -123,9 +123,9 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 hidden md:inline max-w-lg">
-        <img src={IceCreamGirl} alt="girl holding a giant ice cream cone"/>
-      </div>
+      {/* <div> */}
+        <img className="flex-1 hidden md:inline max-w-lg" src={IceCreamGirl} alt="girl holding a giant ice cream cone"/>
+      {/* </div> */}
     </>
   );
 };

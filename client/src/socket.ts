@@ -69,7 +69,6 @@ export class Socket {
     data,
     callback
   ) => {
-    console.log(`EMITTING NEW SESSION ${JSON.stringify(data)}`);
     this.emit(data, callback, "newSession");
   };
 
@@ -80,13 +79,6 @@ export class Socket {
     this.emit(data, callback, "tryJoinSession");
   };
 
-  // setUserName: (
-  //   data: SetUserNameData,
-  //   callback: SetUserNameCallback
-  // ) => void = (data, callback) => {
-  //   this.emit(data, callback, "setUserName");
-  // };
-
   subscribeToVoteAdded = (callback: Function) => {
     this.socket.on("addedVote", callback);
   };
@@ -96,7 +88,6 @@ export class Socket {
   }  
 
   subscribeToRestaurantAdded = (callback: Function) => {
-    console.log(`socket class: got addedRestaurant`)
     this.socket.on("addedRestaurant", callback);
   };
 

@@ -154,14 +154,25 @@ const tryJoinSession = async (
       ? true
       : false;
     console.log(`sending success callback.`);
-    const sC = sessionCache[data.sessionId]
+    const sC = sessionCache[data.sessionId];
     callback({
       success: true,
       userId: userId,
-      creatorName: sC.users[sC.creator] ? (sC.users[sC.creator]  as { name: string }).name : "Session Creator",
+      creatorName: sC.users[sC.creator]
+        ? (sC.users[sC.creator] as { name: string }).name
+        : "Session Creator",
       previouslyAuthenticated: previouslyAuthenticated,
       restaurants: await joinRestaurants(data.sessionId),
       location: sessionCache[data.sessionId].location,
+      previousVotes: Object.entries(sessionCache[data.sessionId].restaurants)
+        .filter(([_, votes]) => votes.hasOwnProperty(userId))
+        .map(([restId, votes]) => ({
+          id: restId,
+          votes: (votes as Votes)[userId],
+        }))
+        .reduce((obj: any, cur) => {
+          return { ...obj, [cur.id]: cur.votes };
+        }, {}) || {},
     });
   } else {
     console.log(`sending failure callback.`);
@@ -403,7 +414,7 @@ let restaurantSearch = (
       `returnedbusinesses are now ${JSON.stringify(returnedBusinesses)}`
     );
     resolve(returnedBusinesses);
-    console.log('here:)')
+    console.log("here:)");
     returnedBusinesses.forEach((b: Business) => {
       restaurantCache[b.id] = b;
     });

@@ -15,7 +15,6 @@ import { BusinessWithVotes, Hours } from "./YelpInterfaces";
 
 export const DisplayItem: React.FC<{
   restaurant: BusinessWithVotes;
-  // voteOnRestaurant: Function;
   addRestaurant?: ReactNode;
   vote?: ReactNode;
 }> = ({ restaurant, addRestaurant, vote }) => {
@@ -42,10 +41,10 @@ export const DisplayItem: React.FC<{
       <div className="flex-initial">{addRestaurant}</div>
 
       <div className="flex-1">
-        <h2 className="leading-tight font-display italic font-bold text-xl text-theme-dark-gray">
+        <h2 className="leading-tight font-display italic font-bold text-xl text-theme-dark-gray mr-6">
           {restaurant.business.name}
           {restaurant.business.price && (
-            <span className="ml-2 px-1 pt-1 rounded bg-theme-light-gray text-white text-sm">
+            <span className="ml-2 px-1 pt-1 rounded bg-theme-light-gray text-white text-sm whitespace-no-wrap">
               {restaurant.business.price.split("").map((_) => (
                 <FontAwesomeIcon icon={faDollarSign} />
               ))}
@@ -53,7 +52,7 @@ export const DisplayItem: React.FC<{
           )}
         </h2>
         <div className="pl-3">
-          <div className="text-theme-light-gray font-display leading-none">
+          <div className="text-theme-light-gray font-display leading-none mr-6">
             {restaurant.business.categories.map((c) => c.title).join(", ")}
           </div>
           {restaurant.business.hours && restaurant.business.hours[0] && (
