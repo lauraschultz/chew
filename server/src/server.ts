@@ -1,7 +1,9 @@
-import express, { json } from "express";
+import express from "express";
 import axios, { AxiosPromise } from "axios";
 import firebase from "firebase";
 import socket from "socket.io";
+import { firebaseConfig, yelpApiKey } from "../config";
+import { FirebaseDb, FirebaseSession, Users, Votes } from "../firebaseTypes";
 import {
   Business,
   BusinessWithVotes,
@@ -10,9 +12,7 @@ import {
   TryJoinSessionCallback,
   TryJoinSessionData,
   Hours,
-} from "../shared/types";
-import { firebaseConfig, yelpApiKey } from "./config";
-import { FirebaseDb, FirebaseSession, Users, Votes } from "./firebaseTypes";
+} from "./types";
 
 const PORT = process.env.PORT || 4000;
 const VOTE_VALUES = 4;
@@ -26,10 +26,6 @@ let database = firebase.database(),
   server = app.listen(PORT, () => console.log(`listening on port ${PORT}`)),
   io = socket(server, { origins: "*:*" });
 
-const rootRef = database.ref();
-
-const dashReplacement = "_usedToBeADash_";
-
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header(
@@ -38,6 +34,9 @@ app.use(function (req, res, next) {
   );
   next();
 });
+const rootRef = database.ref();
+
+const dashReplacement = "_usedToBeADash_";
 
 app.get(
   "/search/:sessionId/:searchTerm/:openHours/:priceRange/:services",
@@ -164,15 +163,16 @@ const tryJoinSession = async (
       previouslyAuthenticated: previouslyAuthenticated,
       restaurants: await joinRestaurants(data.sessionId),
       location: sessionCache[data.sessionId].location,
-      previousVotes: Object.entries(sessionCache[data.sessionId].restaurants)
-        .filter(([_, votes]) => votes.hasOwnProperty(userId))
-        .map(([restId, votes]) => ({
-          id: restId,
-          votes: (votes as Votes)[userId],
-        }))
-        .reduce((obj: any, cur) => {
-          return { ...obj, [cur.id]: cur.votes };
-        }, {}) || {},
+      previousVotes:
+        Object.entries(sessionCache[data.sessionId].restaurants)
+          .filter(([_, votes]) => votes.hasOwnProperty(userId))
+          .map(([restId, votes]) => ({
+            id: restId,
+            votes: (votes as Votes)[userId],
+          }))
+          .reduce((obj: any, cur) => {
+            return { ...obj, [cur.id]: cur.votes };
+          }, {}) || {},
     });
   } else {
     console.log(`sending failure callback.`);

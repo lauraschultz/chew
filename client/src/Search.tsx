@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useContext, useEffect } from "react";
+import React, { useState, FormEvent, useContext, useEffect, useCallback } from "react";
 import { Business } from "./YelpInterfaces";
 import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -87,19 +87,19 @@ const Search: React.FC<{
   searchFormState,
   updateSearchFormState
 }) => {
-  console.log(`SEARCH COMPONENT: searchFormState is ${JSON.stringify(searchFormState)}`)
   let [searchTerm, setSearchTerm] = useState(searchFormState.search || "");
   let [businesses, setBusinesses] = useState(searchFormState.results || new Array<Business>());
   let [loadingSearch, setLoadingSearch] = useState(false);
   let [filterResults, setFilterResults] = useState<FilterResults>();
+  const updateFilter = useCallback((r: FilterResults) => {
+    console.log(`filter sent: ${JSON.stringify(r)}`);
+    setFilterResults(r);
+  }, [setFilterResults])
 
   useEffect(() => {
-    updateSearchFormState({search: searchTerm})
-  }, [searchTerm])
+    updateSearchFormState({search: searchTerm, results:businesses})
+  }, [searchTerm, businesses, updateSearchFormState])
 
-  useEffect(() => {
-    updateSearchFormState({results: businesses})
-  }, [businesses])
 
   return (
     <div className="max-w-md w-full mx-auto">
@@ -155,11 +155,8 @@ const Search: React.FC<{
           <FontAwesomeIcon aria-label="search" icon={faSearch} />
         </button>
         <Filters
-          update={(r: FilterResults) => {
-            console.log(`filter sent: ${JSON.stringify(r)}`);
-            setFilterResults(r);
-          }}
-          updateSearchFormFilterState={(f) => updateSearchFormState({filter: f})}
+          update={updateFilter}
+          updateSearchFormState={updateSearchFormState}
           searchFormFilterState={searchFormState.filter}
         />
       </form>

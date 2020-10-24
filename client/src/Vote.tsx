@@ -33,18 +33,21 @@ const Vote: React.FC<{
             <FontAwesomeIcon className={i.color} icon={i.icon} size="2x" />
           </div>
           <div className={currentVote === idx ? "" : "hidden"}>
-            <img src={Corner} className="absolute top-0 left-0" />
+            <img src={Corner} className="absolute top-0 left-0" alt="" />
             <img
               src={Corner}
               className="absolute top-0 right-0 transform rotate-90"
+              alt=""
             />
             <img
               src={Corner}
               className="absolute bottom-0 right-0 transform rotate-180"
+              alt=""
             />
             <img
               src={Corner}
               className="absolute bottom-0 left-0 transform -rotate-90"
+              alt=""
             />
           </div>
 

@@ -5,13 +5,14 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useReducer, useState } from "react";
 import { FilterResults } from "./Search";
+import { SearchFormState } from "./Templates/AppTemplate";
 import { FilterForm } from "./YelpInterfaces";
 
 const Filters: React.FC<{
   update: (newFilters: FilterResults) => void;
-  updateSearchFormFilterState: (f: FilterForm) => void;
+  updateSearchFormState: (s: Partial<SearchFormState>) => void;
   searchFormFilterState?: FilterForm
-}> = ({ update, updateSearchFormFilterState, searchFormFilterState }) => {
+}> = ({ update, updateSearchFormState, searchFormFilterState }) => {
   const initialForm: FilterForm = {
     openDate: "any",
     openNow: false,
@@ -30,8 +31,8 @@ const Filters: React.FC<{
   // let onlyOnePriceSet: boolean;
 
   useEffect(() => {
-    updateSearchFormFilterState(state);
-  }, [state]);
+    updateSearchFormState({filter: state});
+  }, [state, updateSearchFormState]);
 
   // useEffect(() => {
   //   onlyOnePriceSet = !(state.prices[0]! > -1 && state.prices[1]! > -1);
@@ -64,7 +65,7 @@ const Filters: React.FC<{
         .map(([e, _]) => e)
         .join(","),
     });
-  }, [state]);
+  }, [state, update]);
 
   const isBetween = (n: number, stops: (number | undefined)[]) => {
     if (!(typeof stops[0] === "number" && typeof stops[1] === "number")) {

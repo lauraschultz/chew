@@ -6,14 +6,14 @@ export const useClickOutsideListenerRef = (onClose: () => void) => {
     if (e.key === 'Escape') {
       onClose()
     }
-  }, [])
+  }, [onClose])
   const clickListener = useCallback(
     (e: MouseEvent) => {
       if (!(ref.current! as any).contains(e.target)) {
         onClose?.()
       }
     },
-    [ref.current],
+    [onClose],
   )
   useEffect(() => {
     document.addEventListener('click', clickListener)
@@ -22,6 +22,6 @@ export const useClickOutsideListenerRef = (onClose: () => void) => {
       document.removeEventListener('click', clickListener)
       document.removeEventListener('keyup', escapeListener)
     }
-  }, [])
+  }, [clickListener, escapeListener])
   return ref
 }

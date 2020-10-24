@@ -9,7 +9,7 @@ import {
   faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactNode, useContext, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { icons } from "./VotingIcons";
 import { BusinessWithVotes, Hours } from "./YelpInterfaces";
 

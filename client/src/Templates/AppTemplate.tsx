@@ -6,7 +6,13 @@ import {
   faUtensils,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { ReactFragment, useContext, useEffect, useState } from "react";
+import React, {
+  ReactFragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import Media from "react-media";
 import {
   Link,
@@ -44,7 +50,6 @@ const AppTemplate: React.FC = () => {
     setSessionId,
     userId,
     setUserId,
-    userState,
     setUserState,
     location,
     setLocation,
@@ -60,7 +65,6 @@ const AppTemplate: React.FC = () => {
     Partial<SearchFormState>
   >({});
   let history = useHistory();
-
 
   useEffect(() => {
     socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
@@ -91,6 +95,12 @@ const AppTemplate: React.FC = () => {
   const voteOnRestaurant = (restaurantId: string, voteNum: number) =>
     socket.addVote(sessionId, userId, restaurantId, voteNum);
 
+  const updateSearchFormState = useCallback(
+    (s: Partial<SearchFormState>) =>
+      setSearchFormState((old) => ({ ...old, ...s })),
+    [setSearchFormState]
+  );
+
   let search: ReactFragment = (
     <div className="flex-1 pt-4">
       <Search
@@ -100,9 +110,7 @@ const AppTemplate: React.FC = () => {
         location={location}
         creatorName={creatorName}
         searchFormState={searchFormState}
-        updateSearchFormState={(s: Partial<SearchFormState>) =>
-          setSearchFormState((old) => ({ ...old, ...s }))
-        }
+        updateSearchFormState={updateSearchFormState}
       />
     </div>
   );
@@ -157,7 +165,7 @@ const AppTemplate: React.FC = () => {
         }
       });
     }
-  }, [sessionId]); //sessionId
+  }, [sessionId, history, setCreatorName, setLocation, setPreviousVotes, setSessionId, setUserId, setUserState, userId]); //sessionId
 
   return (
     <>
@@ -294,16 +302,20 @@ const AppTemplate: React.FC = () => {
                       //     <div className="w-screen inline-block">{search}</div>
                       //   </div>
                       // </div>
-                    
-                  <Switch>
-                    <Route path="/ID/:sessionId" exact render={() => display} />
-                    <Route
-                      path="/ID/:sessionId/search"
-                      exact
-                      render={() => search}
-                    />
-                  </Switch>
-                  )}
+
+                      <Switch>
+                        <Route
+                          path="/ID/:sessionId"
+                          exact
+                          render={() => display}
+                        />
+                        <Route
+                          path="/ID/:sessionId/search"
+                          exact
+                          render={() => search}
+                        />
+                      </Switch>
+                    )}
                   />
                 )}
               />

@@ -41,7 +41,7 @@ export const UserContextProvider: React.FC = ({ children }) => {
     if (match) {
       setSessionId(match.params.sessionId);
     }
-  }, [location]);
+  }, [location, appLoc.pathname]);
 
   let createSession = (e: FormEvent, userName: string, loc: string) => {
     e.preventDefault();
