@@ -3,6 +3,10 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
+import { googleCloudApiKey, SERVER } from "./config";
+
+process.env.REACT_APP_SERVER = SERVER;
+process.env.REACT_APP_GOOGLE_CLOUD_API_KEY = googleCloudApiKey;
 
 ReactDOM.render(
   <React.StrictMode>

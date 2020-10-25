@@ -1,11 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { googleCloudApiKey } from "./config";
 import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
-
-interface PlacesSearchResult {
-  id: string;
-  description: string;
-}
 
 let autoComplete: google.maps.places.AutocompleteService;
 
@@ -51,7 +45,7 @@ const PlacesAutocomplete: React.FC<{
 
   useEffect(() => {
     loadScript(
-      `https://maps.googleapis.com/maps/api/js?key=${googleCloudApiKey}&libraries=places`,
+      `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_CLOUD_API_KEY}&libraries=places`,
       () => handleScriptLoad()
     );
   }, []);
