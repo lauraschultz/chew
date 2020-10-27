@@ -19,6 +19,7 @@
     "axios": "^0.20.0",
     "history": "^5.0.0",
     "lodash": "^4.17.20",
+    "netlify-cli": "^2.65.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-media": "^1.10.0",

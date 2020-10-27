@@ -37,14 +37,3 @@ export interface BusinessWithVotes {
   business: Business;
   votes: string[];
 }
-
-export interface FilterForm {
-  openDate: "any" | "today";
-  openNow: boolean;
-  prices: (number | undefined)[];
-  services: {
-    pickup: boolean;
-    delivery: boolean;
-    restaurant_reservation: boolean;
-  };
-}

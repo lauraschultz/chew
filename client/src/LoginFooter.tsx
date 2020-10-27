@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const LoginFooter: React.FC = () => (
   <footer className="w-full">
     <img src={Triangles} alt="decorative footer border"/>
-    <div className="bg-theme-dark-gray text-white p-2 md:px-8 md:py-4 lg:px-24 block md:flex justify-around leading-tight items-center">
+    <div className="bg-theme-dark-gray text-white p-2 md:px-8 md:py-4 lg:px-24 block sm:flex justify-around leading-tight items-center">
       <Link to="/getStarted">
         <img className="flex-initial w-32" src={Logo} alt="chew logo"/>
       </Link>

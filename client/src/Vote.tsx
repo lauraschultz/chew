@@ -23,7 +23,7 @@ const Vote: React.FC<{
       {icons.map((i, idx) => (
         <button
           key={idx}
-          className="p-xs m-xs"
+          className="p-xs m-xs btn-focus rounded-full"
           // className={"fa-layers fa-fw fa-2x m-1"}
           onClick={() => addVote(idx)}
           aria-label={i.descText}

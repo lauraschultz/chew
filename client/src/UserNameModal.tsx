@@ -58,25 +58,10 @@ export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
               </label>
             <button
               type="submit"
-              className="py-1 uppercase tracking-wide text-sm text-white bg-theme-yellow hover:theme-dark-yellow w-full mt-4 rounded shadow font-bold"
+              className="py-1 uppercase tracking-wide text-sm text-white bg-theme-yellow hover:theme-dark-yellow w-full mt-4 rounded shadow font-bold btn-focus"
             >
               join session
             </button>
-            {/* <div className="flex justify-around">
-              <button
-                type="button"
-                onClick={escape}
-                className="py-1 px-2 uppercase tracking-wide text-sm text-gray-500 border border-gray-500 mt-4 rounded shadow font-bold flex-1"
-              >
-                cancel
-              </button>
-              <button
-                type="submit"
-                className="py-1 px-2 uppercase tracking-wide text-sm text-white bg-theme-yellow mt-4 rounded shadow font-bold flex-1"
-              >
-                done
-              </button>
-            </div> */}
           </form>
         )}
       </UserContextConsumer>

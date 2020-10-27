@@ -14,13 +14,13 @@ let restaurantCache = {};
 let sessionCache = {};
 firebase_1.default.initializeApp(config_1.firebaseConfig);
 let database = firebase_1.default.database(), app = express_1.default(), server = app.listen(PORT, () => console.log(`listening on port ${PORT}`)), io = socket_io_1.default(server, { origins: "*:*" });
-const rootRef = database.ref();
-const dashReplacement = "_usedToBeADash_";
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+const rootRef = database.ref();
+const dashReplacement = "_usedToBeADash_";
 app.get("/search/:sessionId/:searchTerm/:openHours/:priceRange/:services", async (req, res) => {
     console.log(`searching: ${JSON.stringify(req.params)}`);
     const { sessionId, searchTerm, openHours, priceRange, services, } = req.params;
@@ -103,10 +103,10 @@ const tryJoinSession = async (data, callback, socket) => {
             restaurants: await joinRestaurants(data.sessionId),
             location: sessionCache[data.sessionId].location,
             previousVotes: Object.entries(sessionCache[data.sessionId].restaurants)
-                .filter(([_, votes]) => votes.hasOwnProperty(userId))
-                .map(([restId, votes]) => ({
+                .filter(([_, restaurantInfo]) => restaurantInfo.hasOwnProperty(userId))
+                .map(([restId, restaurantInfo]) => ({
                 id: restId,
-                votes: votes[userId],
+                votes: restaurantInfo.votes ? restaurantInfo.votes[userId] : {},
             }))
                 .reduce((obj, cur) => {
                 return { ...obj, [cur.id]: cur.votes };
@@ -139,10 +139,10 @@ const addVote = async (sessionId, userId, restaurantId, voteNum) => {
     await refreshCache(sessionId);
     // update in cache
     if (sessionCache[sessionId].restaurants[restaurantId]) {
-        sessionCache[sessionId].restaurants[restaurantId][userId] = voteNum;
+        sessionCache[sessionId].restaurants[restaurantId].votes[userId] = voteNum;
     }
     else {
-        sessionCache[sessionId].restaurants[restaurantId] = { [userId]: voteNum };
+        sessionCache[sessionId].restaurants[restaurantId].votes = { [userId]: voteNum };
     }
     // update in firebase
     rootRef
@@ -152,7 +152,7 @@ const addVote = async (sessionId, userId, restaurantId, voteNum) => {
         console.log("emitting addedVote");
         io.in(sessionId).emit("addedVote", {
             restaurantId: restaurantId,
-            votes: shapeVotes(sessionCache[sessionId].restaurants[restaurantId], sessionCache[sessionId].users),
+            votes: shapeVotes(sessionCache[sessionId].restaurants[restaurantId].votes, sessionCache[sessionId].users),
         });
     });
 };
@@ -160,10 +160,10 @@ const addRestaurant = async (sessionId, userId, restaurantId) => {
     await refreshCache(sessionId);
     // update in cache
     if (sessionCache[sessionId].restaurants) {
-        sessionCache[sessionId].restaurants[restaurantId] = {};
+        sessionCache[sessionId].restaurants[restaurantId].votes = {};
     }
     else {
-        sessionCache[sessionId].restaurants = { [restaurantId]: {} };
+        sessionCache[sessionId].restaurants.votes = { addedBy: userId, votes: {} };
     }
     // update in firebase
     rootRef
@@ -342,13 +342,13 @@ const joinRestaurants = async (sessionId) => {
     await refreshCache(sessionId);
     return new Promise((resolve, reject) => {
         Promise
-            .allSettled(Object.entries(sessionCache[sessionId].restaurants).map(async ([rId, votes]) => {
-            console.log(`join map fn: ${JSON.stringify({ rId, votes })}`);
+            .allSettled(Object.entries(sessionCache[sessionId].restaurants).map(async ([rId, restaurantInfo]) => {
+            console.log(`join map fn: ${JSON.stringify({ rId, votes: restaurantInfo })}`);
             return {
                 business: await memoizedGetRestaurantById(rId),
                 votes: shapeVotes(
                 // sessionCache[sessionId].restaurants[rId],
-                votes, sessionCache[sessionId].users),
+                restaurantInfo.votes, sessionCache[sessionId].users),
             };
         }))
             .then((result) => {

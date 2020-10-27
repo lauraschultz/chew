@@ -7,20 +7,20 @@ import {
   Business,
 } from "../../shared/types";
 import axios from "axios";
+import { SERVER } from "./config";
 
 export class Socket {
-  SERVER = process.env.REACT_APP_SERVER || 'localhost:4000';
   socket: SocketIOClient.Socket;
 
   constructor() {
     console.log(`running socket constructor.`)
-    this.socket = io.connect(this.SERVER);
+    this.socket = io.connect(SERVER);
   }
 
   search = (sessionId: string, searchTerm: string, openHours:string, priceRange:string, services:string): Promise<Business[]> =>
     new Promise((resolve, reject) =>
       axios
-        .get(`${this.SERVER}/search/${sessionId}/${searchTerm}/${openHours}/${priceRange}/${services}`)
+        .get(`${SERVER}/search/${sessionId}/${searchTerm}/${openHours}/${priceRange}/${services}`)
         .then((result) => resolve(result.data))
     );
 
@@ -31,8 +31,9 @@ export class Socket {
   ): Promise<boolean> =>
     new Promise((resolve, reject) =>
       axios
-        .post(`${this.SERVER}/setUserName/${sessionId}/${userId}/${userName}`)
+        .post(`${SERVER}/setUserName/${sessionId}/${userId}/${userName}`)
         .then((result) => resolve(result.data))
+        .catch(() => console.log(`error`))
     );
 
   addVote = (
@@ -44,7 +45,7 @@ export class Socket {
     new Promise((resolve, reject) =>
       axios
         .post(
-          `${this.SERVER}/addVote/${sessionId}/${userId}/${restaurantId}/${voteNum}`
+          `${SERVER}/addVote/${sessionId}/${userId}/${restaurantId}/${voteNum}`
         )
         .then((result) => resolve(result.data))
     );
@@ -56,7 +57,7 @@ export class Socket {
   ): Promise<boolean> =>
     new Promise((resolve, reject) =>
       axios
-        .post(`${this.SERVER}/addRestaurant/${sessionId}/${userId}/${restaurantId}`)
+        .post(`${SERVER}/addRestaurant/${sessionId}/${userId}/${restaurantId}`)
         .then((result) => resolve(result.data))
     );
 

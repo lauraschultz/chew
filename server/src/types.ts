@@ -25,6 +25,7 @@ export interface Hours {
 }
 
 export interface BusinessWithVotes {
+  addedBy:string;
   business: Business;
   votes: string[];
 }

@@ -6,6 +6,7 @@ import AppTemplate from "./Templates/AppTemplate";
 import "./comp.css";
 import { UserContextProvider } from "./UserDataContext";
 import FourOhFour from "./404";
+import TOS from "./TOS";
 
 const App: React.FC = () => (
   <UserContextProvider>
@@ -18,6 +19,9 @@ const App: React.FC = () => (
       <Route path="/ID/:sessionId" render={() => <AppTemplate />}></Route>
       <Route path="/404" exact>
         <FourOhFour />
+      </Route>
+      <Route path="/TOS" exact>
+        <TOS />
       </Route>
       <Route path="/" exact>
         <Redirect to="/getStarted" />

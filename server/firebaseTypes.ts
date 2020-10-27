@@ -10,11 +10,14 @@ export interface FirebaseSession {
 }
 
 export interface Restaurants {
-  [yelpId: string]: Votes | false;
+  [yelpId: string]: {
+    addedBy: string;
+    votes: Votes | false;
+  };
 }
 
 export interface Votes {
-   [userId: string]: number; 
+  [userId: string]: number;
 }
 
 export interface Users {

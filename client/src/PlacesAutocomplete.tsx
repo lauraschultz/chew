@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { googleCloudApiKey } from "./config";
 import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 
 let autoComplete: google.maps.places.AutocompleteService;
@@ -13,17 +14,6 @@ const loadScript = (
   document.head.appendChild(script);
   script.src = url;
 };
-
-// function handleScriptLoad() {
-//   //   autoComplete = new (window as any).google.maps.places.Autocomplete(
-//   //     searchTerm,
-//   //     { types: ["(regions)"] }
-//   //   );
-//   //   autoComplete.setFields(["address_components", "formatted_address"]);
-//   //   autoComplete.addListener("place_changed", () =>
-//   //     handlePlaceSelect(updateQuery)
-//   //   );
-// }
 
 const PlacesAutocomplete: React.FC<{
   searchTerm: string;
@@ -45,7 +35,7 @@ const PlacesAutocomplete: React.FC<{
 
   useEffect(() => {
     loadScript(
-      `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_CLOUD_API_KEY}&libraries=places`,
+      `https://maps.googleapis.com/maps/api/js?key=${googleCloudApiKey}&libraries=places`,
       () => handleScriptLoad()
     );
   }, []);
@@ -91,7 +81,8 @@ const PlacesAutocomplete: React.FC<{
   if (
     scriptLoaded &&
     searchTerm &&
-    Math.abs(searchTerm.length - currentSearchTerm.current.length) > 1
+    searchTerm !== currentSearchTerm.current
+    // Math.abs(searchTerm.length - currentSearchTerm.current.length) > 1
   ) {
     currentSearchTerm.current = searchTerm;
     autoComplete.getPlacePredictions(
@@ -132,7 +123,9 @@ const PlacesAutocomplete: React.FC<{
         </li>
       ))}
       {currentSearchResults.length > 0 && (
+        <div>
         <img src={poweredByGoogle} alt="powered by Google" className="float-right px-2 py-1 w-38" />
+        </div>
       )}
     </ul>
   );

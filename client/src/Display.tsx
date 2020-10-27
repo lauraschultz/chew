@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BusinessWithVotes } from "./YelpInterfaces";
+import { BusinessWithVotes } from "../../shared/types";
 import Vote from "./Vote";
 import DisplayItem from "./DisplayItem";
 import { UserContext } from "./UserDataContext";
@@ -13,7 +13,7 @@ const Display: React.FC<{
   let { previousVotes, setPreviousVotes } = useContext(UserContext);
   return (
     <div className="divide-y divide-theme-extra-light-gray">
-      <h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none -mb-1">
+      <h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none">
         Restaurants
       </h2>
       {Object.keys(addedRestaurants).length === 0 && (

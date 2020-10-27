@@ -29,7 +29,7 @@ const FooterLinks: React.FC = () => (
       <FontAwesomeIcon icon={faStar} size="sm" className="mr-2" />
       star on Github
     </a>
-    <Link to="/">
+    <Link to="/TOS">
       <FontAwesomeIcon icon={faFileSignature} size="sm" className="mr-2" />
       terms of use & privacy policy
     </Link>

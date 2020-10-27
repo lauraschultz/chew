@@ -1,4 +1,33 @@
+[build]
+    base = "client/"
+    publish = "build/"
+
 [[redirects]]
-    from = "/*"
+    from = "/chew/static/*"
+    to = "/static/:splat"
+    status = 200
+
+[[redirects]]
+    from = "/chew/logo64.png"
+    to = "/logo64.png"
+    status = 200
+
+[[redirects]]
+    from = "/chew/logo192.png"
+    to = "/logo192.png"
+    status = 200
+
+[[redirects]]
+    from = "/chew/logo512.png"
+    to = "/logo512.png"
+    status = 200
+
+[[redirects]]
+    from = "/chew/manifest.json"
+    to = "/manifest.json"
+    status = 200
+
+[[redirects]]
+    from = "/chew/*"
     to = "/index.html"
     status = 200

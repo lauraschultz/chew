@@ -11,7 +11,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ReactNode, useState } from "react";
 import { icons } from "./VotingIcons";
-import { BusinessWithVotes, Hours } from "./YelpInterfaces";
+import { BusinessWithVotes, Hours } from "../../shared/types";
 
 export const DisplayItem: React.FC<{
   restaurant: BusinessWithVotes;
@@ -23,30 +23,34 @@ export const DisplayItem: React.FC<{
   return (
     <div
       key={restaurant.business.id}
-      className="relative p-1 lg:p-2 my-2 max-w-md mx-auto flex"
+      className="relative p-1 lg:p-2 my-1 max-w-md mx-auto flex"
     >
-      <button className="fa-layers fa-fw fa-2x absolute m-2 right-0">
+      <button className="fa-layers fa-fw fa-2x absolute m-2 right-0 btn-focus rounded-full"
+      onClick={() => setExpanded((prev) => !prev)}>
         <FontAwesomeIcon
           className=" text-white"
           icon={faCircle}
-          onClick={() => setExpanded((prev) => !prev)}
         />
         <FontAwesomeIcon
           className=" text-theme-yellow"
           icon={expanded ? faChevronCircleUp : faChevronCircleDown}
-          onClick={() => setExpanded((prev) => !prev)}
         />
       </button>
 
       <div className="flex-initial">{addRestaurant}</div>
 
       <div className="flex-1">
+        {restaurant.addedBy && (
+          <div className="text-xs uppercase tracking-wide text-theme-med-gray">
+            Added by {restaurant.addedBy}
+          </div>
+        )}
         <h2 className="leading-tight font-display italic font-bold text-xl text-theme-dark-gray mr-6">
           {restaurant.business.name}
           {restaurant.business.price && (
             <span className="ml-2 px-1 pt-1 rounded bg-theme-light-gray text-white text-sm whitespace-no-wrap">
-              {restaurant.business.price.split("").map((_) => (
-                <FontAwesomeIcon icon={faDollarSign} />
+              {restaurant.business.price.split("").map((_, i) => (
+                <FontAwesomeIcon icon={faDollarSign} key={i} />
               ))}
             </span>
           )}

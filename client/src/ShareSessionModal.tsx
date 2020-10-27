@@ -20,7 +20,7 @@ const ShareSessionModal: React.FC<{ escape: () => void }> = ({ escape }) => {
         </div>
         <button
           onClick={escape}
-          className="py-1 uppercase tracking-wide text-sm border border-gray-700 w-full mt-2 rounded shadow font-bold"
+          className="py-1 uppercase tracking-wide text-sm border border-gray-700 w-full mt-2 rounded shadow font-bold btn-focus"
         >
           dismiss
         </button>

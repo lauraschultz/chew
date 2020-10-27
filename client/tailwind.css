@@ -10,4 +10,10 @@
     #root {
         @apply flex flex-col min-h-screen bg-theme-light font-body
     }
+    .btn-focus:focus {
+        @apply outline-none
+    }
+    .btn-focus:focus-visible {
+        @apply outline-none shadow-outline border-theme-med-gray
+    }
 }

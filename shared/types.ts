@@ -14,7 +14,6 @@ export interface Business {
   price: string;
 }
 
-
 export interface Hours {
   open: {
     is_overnight: boolean;
@@ -25,6 +24,7 @@ export interface Hours {
 }
 
 export interface BusinessWithVotes {
+  addedBy?: string;
   business: Business;
   votes: string[];
 }

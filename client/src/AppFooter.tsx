@@ -6,7 +6,7 @@ import FooterLinks from "./FooterLinks";
 const AppFooter: React.FC = () => (
   <footer className="text-theme-red w-full">
     <img src={Waves} alt="decorative footer border"/>
-    <div className="bg-theme-red text-white p-2 md:px-8 md:py-4 lg:px-24 block md:flex justify-around leading-tight">
+    <div className="bg-theme-red text-white p-2 md:px-8 md:py-4 lg:px-24 block sm:flex justify-around leading-tight">
       <div className="flex-initial">
         <p className="mb-1">Share this session with others:</p>
         <CopySessionUrl

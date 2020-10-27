@@ -33,12 +33,22 @@ import socket from "../socket";
 import Toast from "../Toast";
 import { UserContext, UserContextConsumer } from "../UserDataContext";
 import { UserNameModal } from "../UserNameModal";
-import { FilterForm } from "../YelpInterfaces";
 
 export interface SearchFormState {
   search: string;
   filter: FilterForm;
   results: Business[];
+}
+
+export interface FilterForm {
+  openDate: "any" | "today";
+  openNow: boolean;
+  prices: (number | undefined)[];
+  services: {
+    pickup: boolean;
+    delivery: boolean;
+    restaurant_reservation: boolean;
+  };
 }
 
 const AppTemplate: React.FC = () => {

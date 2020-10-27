@@ -602,6 +602,20 @@ video {
   font-family: Lato
 }
 
+.btn-focus:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px
+}
+
+.btn-focus:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  --border-opacity: 1;
+  border-color: #625D50;
+  border-color: rgba(98, 93, 80, var(--border-opacity))
+}
+
 .container{
   width: 100%;
 }

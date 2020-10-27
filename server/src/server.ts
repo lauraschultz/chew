@@ -165,10 +165,14 @@ const tryJoinSession = async (
       location: sessionCache[data.sessionId].location,
       previousVotes:
         Object.entries(sessionCache[data.sessionId].restaurants)
-          .filter(([_, votes]) => votes.hasOwnProperty(userId))
-          .map(([restId, votes]) => ({
+          .filter(([_, restaurantInfo]) =>
+            restaurantInfo.votes.hasOwnProperty(userId)
+          )
+          .map(([restId, restaurantInfo]) => ({
             id: restId,
-            votes: (votes as Votes)[userId],
+            votes: restaurantInfo.votes
+              ? (restaurantInfo.votes as Votes)[userId]
+              : {},
           }))
           .reduce((obj: any, cur) => {
             return { ...obj, [cur.id]: cur.votes };
@@ -212,24 +216,26 @@ const addVote = async (
 ) => {
   await refreshCache(sessionId);
   // update in cache
-  if (sessionCache[sessionId].restaurants[restaurantId]) {
-    (sessionCache[sessionId].restaurants[restaurantId] as Votes)[
+  if (sessionCache[sessionId].restaurants[restaurantId] && sessionCache[sessionId].restaurants[restaurantId].votes) {
+    (sessionCache[sessionId].restaurants[restaurantId].votes as Votes)[
       userId
     ] = voteNum;
   } else {
-    sessionCache[sessionId].restaurants[restaurantId] = { [userId]: voteNum };
+    sessionCache[sessionId].restaurants[restaurantId].votes = {
+      [userId]: voteNum,
+    };
   }
 
   // update in firebase
   rootRef
-    .child(`${sessionId}/restaurants/${restaurantId}`)
+    .child(`${sessionId}/restaurants/${restaurantId}/votes`)
     .update({ [userId]: voteNum })
     .then(() => {
       console.log("emitting addedVote");
       io.in(sessionId).emit("addedVote", {
         restaurantId: restaurantId,
         votes: shapeVotes(
-          sessionCache[sessionId].restaurants[restaurantId],
+          sessionCache[sessionId].restaurants[restaurantId].votes,
           sessionCache[sessionId].users
         ),
       });
@@ -244,32 +250,44 @@ const addRestaurant = async (
   await refreshCache(sessionId);
   // update in cache
   if (sessionCache[sessionId].restaurants) {
-    sessionCache[sessionId].restaurants[restaurantId] = {};
+    sessionCache[sessionId].restaurants[restaurantId] = {
+      addedBy: userId,
+      votes: false,
+    };
   } else {
-    sessionCache[sessionId].restaurants = { [restaurantId]: {} };
+    sessionCache[sessionId].restaurants = {
+      [restaurantId]: { addedBy: userId, votes: false },
+    };
   }
   // update in firebase
   rootRef
     .child(`${sessionId}/restaurants`)
-    .update({ [restaurantId]: false })
+    .update({
+      [restaurantId]: sessionCache[sessionId].restaurants[restaurantId],
+    })
     .then();
   console.log("emitting addedRestaurant");
   io.in(sessionId).emit("addedRestaurant", {
     business: await memoizedGetRestaurantById(restaurantId),
     votes: new Array(VOTE_VALUES),
+    addedBy: getUserNameById(userId, sessionCache[sessionId].users),
   });
 };
 
 let yelpFusion = (url: string): AxiosPromise => {
   console.log(`sending ${url}`);
-  return axios({
-    method: "GET",
-    url: url,
-    headers: {
-      authorization: `Bearer ${yelpApiKey}`,
-      "Content-Type": "application/json",
-    },
-  });
+  return new Promise((resolve, reject) =>
+    axios({
+      method: "GET",
+      url: url,
+      headers: {
+        authorization: `Bearer ${yelpApiKey}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((r) => resolve(r))
+      .catch(() => reject())
+  );
 };
 
 let yelpGql = (query: string) =>
@@ -446,7 +464,7 @@ const refreshCache = async (sessionId: string) => {
         results
           .filter((r: any) => r.status === "fulfilled")
           .map((r: any) => {
-            console.log(`current value in map: ${JSON.stringify(r.value)}`);
+            // console.log(`current value in map: ${JSON.stringify(r.value)}`);
             return r.value;
           })
           .reduce((obj: any, cur: any) => {
@@ -469,15 +487,18 @@ const joinRestaurants = async (
     (Promise as any)
       .allSettled(
         Object.entries(sessionCache[sessionId].restaurants).map(
-          async ([rId, votes]) => {
-            console.log(`join map fn: ${JSON.stringify({ rId, votes })}`);
+          async ([rId, restaurantInfo]) => {
+            console.log(
+              `join map fn: ${JSON.stringify({ rId, votes: restaurantInfo })}`
+            );
             return {
               business: await memoizedGetRestaurantById(rId),
               votes: shapeVotes(
                 // sessionCache[sessionId].restaurants[rId],
-                votes,
+                restaurantInfo.votes,
                 sessionCache[sessionId].users
               ),
+              addedBy: getUserNameById(sessionCache[sessionId].restaurants[rId].addedBy, sessionCache[sessionId].users)
             };
           }
         )
@@ -495,6 +516,13 @@ const joinRestaurants = async (
         );
       });
   });
+};
+
+const getUserNameById = (userId: string, users: Users) => {
+  if (users && users[userId]) {
+    return (users[userId] as {name: string}).name;
+  }
+  return null;
 };
 
 const shapeVotes = (votes: Votes | false, users: Users): string[] => {

@@ -7,7 +7,7 @@ const ModalWelcomeHeader:React.FC<{escape: () => void}> = ({escape}) => {
     return <div className="p-2 text-white bg-gradient-to-r from-theme-red to-theme-dark-red rounded-t font-bold text-xl">
     <span className="">Welcome to</span>
     <img className="inline w-24 ml-1 mr-6" src={Logo} alt="chew logo" />
-    <button className="float-right leading-none" onClick={escape}>
+    <button className="float-right leading-none btn-focus" onClick={escape}>
       <FontAwesomeIcon icon={faTimes} />
     </button>
   </div>

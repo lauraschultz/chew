@@ -3,7 +3,10 @@ module.exports = {
     // removeDeprecatedGapUtilities: true,
     // purgeLayersByDefault: true,
   },
-  purge: [],
+  purge: {
+    enabled:false,
+    content: ['./src/**/*.tsx']
+  },
   theme: {
     fontFamily: {
       display: "Vollkorn",
@@ -43,5 +46,7 @@ module.exports = {
     margin: ["responsive", "hover", "group-hover"],
     borderColor: ['focus', 'focus-within'],
   },
-  plugins: [],
+  plugins: [
+    require('postcss-focus-visible')
+  ],
 };

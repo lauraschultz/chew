@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/chew/static/css/main.074232d7.chunk.css",
+    "main.js": "/chew/static/js/main.487d37f8.chunk.js",
+    "main.js.map": "/chew/static/js/main.487d37f8.chunk.js.map",
+    "runtime-main.js": "/chew/static/js/runtime-main.f2e8438a.js",
+    "runtime-main.js.map": "/chew/static/js/runtime-main.f2e8438a.js.map",
+    "static/js/2.4b5a4462.chunk.js": "/chew/static/js/2.4b5a4462.chunk.js",
+    "static/js/2.4b5a4462.chunk.js.map": "/chew/static/js/2.4b5a4462.chunk.js.map",
+    "index.html": "/chew/index.html",
+    "precache-manifest.f3bccbf6de62c125d4a55f948888ec97.js": "/chew/precache-manifest.f3bccbf6de62c125d4a55f948888ec97.js",
+    "service-worker.js": "/chew/service-worker.js",
+    "static/css/main.074232d7.chunk.css.map": "/chew/static/css/main.074232d7.chunk.css.map",
+    "static/js/2.4b5a4462.chunk.js.LICENSE.txt": "/chew/static/js/2.4b5a4462.chunk.js.LICENSE.txt",
+    "static/media/chew_logo.svg": "/chew/static/media/chew_logo.7c4b5fba.svg",
+    "static/media/corner.svg": "/chew/static/media/corner.fc300196.svg",
+    "static/media/ice_cream_girl.svg": "/chew/static/media/ice_cream_girl.d04fc2e8.svg",
+    "static/media/papers.svg": "/chew/static/media/papers.35254578.svg",
+    "static/media/reading_girl.svg": "/chew/static/media/reading_girl.12122138.svg",
+    "static/media/triangles.svg": "/chew/static/media/triangles.88d99b6d.svg",
+    "static/media/waves.svg": "/chew/static/media/waves.f9254c6c.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f2e8438a.js",
+    "static/js/2.4b5a4462.chunk.js",
+    "static/css/main.074232d7.chunk.css",
+    "static/js/main.487d37f8.chunk.js"
+  ]
+}
