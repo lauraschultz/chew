@@ -1,104 +1,129 @@
 import io from "socket.io-client";
 import {
-  NewSessionData,
-  NewSessionCallback,
-  TryJoinSessionData,
-  TryJoinSessionCallback,
-  Business,
+	NewSessionData,
+	NewSessionCallback,
+	TryJoinSessionData,
+	TryJoinSessionCallback,
+	Business,
 } from "../../shared/types";
 import axios from "axios";
 import { SERVER } from "./config";
 
 export class Socket {
-  socket: SocketIOClient.Socket;
+	socket: SocketIOClient.Socket;
 
-  constructor() {
-    console.log(`running socket constructor.`)
-    this.socket = io.connect(SERVER);
-  }
+	constructor() {
+		this.socket = io.connect(SERVER);
+	}
 
-  search = (sessionId: string, searchTerm: string, openHours:string, priceRange:string, services:string): Promise<Business[]> =>
-    new Promise((resolve, reject) =>
-      axios
-        .get(`${SERVER}/search/${sessionId}/${searchTerm}/${openHours}/${priceRange}/${services}`)
-        .then((result) => resolve(result.data))
-    );
+	search = (
+		sessionId: string,
+		searchTerm: string,
+		openHours: string,
+		priceRange: string,
+		services: string
+	): Promise<Business[]> =>
+		new Promise((resolve, reject) =>
+			axios
+				.get(
+					`${SERVER}/search/${sessionId}/${searchTerm}/${openHours}/${priceRange}/${services}`
+				)
+				.then((result) => resolve(result.data))
+		);
 
-  setUserName = (
-    sessionId: string,
-    userId: string,
-    userName: string
-  ): Promise<boolean> =>
-    new Promise((resolve, reject) =>
-      axios
-        .post(`${SERVER}/setUserName/${sessionId}/${userId}/${userName}`)
-        .then((result) => resolve(result.data))
-        .catch(() => console.log(`error`))
-    );
+	setUserName = (
+		sessionId: string,
+		userId: string,
+		userName: string
+	): Promise<boolean> =>
+		new Promise((resolve, reject) =>
+			axios
+				.post(`${SERVER}/setUserName/${sessionId}/${userId}/${userName}`)
+				.then((result) => resolve(result.data))
+				.catch(() => console.log(`error`))
+		);
 
-  addVote = (
-    sessionId: string,
-    userId: string,
-    restaurantId: string,
-    voteNum: number
-  ): Promise<boolean> =>
-    new Promise((resolve, reject) =>
-      axios
-        .post(
-          `${SERVER}/addVote/${sessionId}/${userId}/${restaurantId}/${voteNum}`
-        )
-        .then((result) => resolve(result.data))
-    );
+	addVote = (
+		sessionId: string,
+		userId: string,
+		restaurantId: string,
+		voteNum: number
+	): Promise<boolean> =>
+		new Promise((resolve, reject) =>
+			axios
+				.post(
+					`${SERVER}/addVote/${sessionId}/${userId}/${restaurantId}/${voteNum}`
+				)
+				.then((result) => resolve(result.data))
+		);
 
-  addRestaurant = (
-    sessionId: string,
-    userId: string,
-    restaurantId: string
-  ): Promise<boolean> =>
-    new Promise((resolve, reject) =>
-      axios
-        .post(`${SERVER}/addRestaurant/${sessionId}/${userId}/${restaurantId}`)
-        .then((result) => resolve(result.data))
-    );
+	addRestaurant = (
+		sessionId: string,
+		userId: string,
+		restaurantId: string
+	): Promise<boolean> =>
+		new Promise((resolve, reject) =>
+			axios
+				.post(`${SERVER}/addRestaurant/${sessionId}/${userId}/${restaurantId}`)
+				.then((result) => resolve(result.data))
+		);
 
-  emit = (data: any, callback: (p: any) => void, title: string) => {
-    console.log(`socket emitting ${title} with data ${JSON.stringify(data)}`);
-    this.socket.emit(title, data, callback);
-  };
+	removeRestaurant = (
+		sessionId: string,
+		userId: string,
+		restaurantId: string
+	): Promise<boolean> =>
+		new Promise((resolve, reject) =>
+			axios
+				.post(
+					`${SERVER}/removeRestaurant/${sessionId}/${userId}/${restaurantId}`
+				)
+				.then((result) => resolve(result.data))
+		);
 
-  newSession: (data: NewSessionData, callback: NewSessionCallback) => void = (
-    data,
-    callback
-  ) => {
-    this.emit(data, callback, "newSession");
-  };
+	emit = (data: any, callback: (p: any) => void, title: string) => {
+		console.log(`socket emitting ${title} with data ${JSON.stringify(data)}`);
+		this.socket.emit(title, data, callback);
+	};
 
-  tryJoinSession: (
-    data: TryJoinSessionData,
-    callback: TryJoinSessionCallback
-  ) => void = (data, callback) => {
-    this.emit(data, callback, "tryJoinSession");
-  };
+	newSession: (data: NewSessionData, callback: NewSessionCallback) => void = (
+		data,
+		callback
+	) => {
+		this.emit(data, callback, "newSession");
+	};
 
-  subscribeToVoteAdded = (callback: Function) => {
-    this.socket.on("addedVote", callback);
-  };
+	tryJoinSession: (
+		data: TryJoinSessionData,
+		callback: TryJoinSessionCallback
+	) => void = (data, callback) => {
+		this.emit(data, callback, "tryJoinSession");
+	};
 
-  unSubscribeToVoteAdded = () => {
-    this.socket.off("addedVote")
-  }  
+	subscribeToVoteAdded = (callback: Function) => {
+		this.socket.on("addedVote", callback);
+	};
 
-  subscribeToRestaurantAdded = (callback: Function) => {
-    this.socket.on("addedRestaurant", callback);
-  };
+	unSubscribeToVoteAdded = () => {
+		this.socket.off("addedVote");
+	};
 
-  unSubscribeToRestaurantAdded = () => {
-    this.socket.off("addedRestaurant")
-  }
+	subscribeToRestaurantAdded = (callback: Function) => {
+		this.socket.on("addedRestaurant", callback);
+	};
+
+	unSubscribeToRestaurantAdded = () => {
+		this.socket.off("addedRestaurant");
+	};
+
+	subscribeToRestaurantRemoved = (callback: Function) => {
+		this.socket.on("removedRestaurant", callback);
+	};
+
+	unSubscribeToRestaurantRemoved = () => {
+		this.socket.off("removedRestaurant");
+	};
 }
 
-
-
 let socket = new Socket();
-console.log("here.");
 export default socket;

@@ -79,7 +79,8 @@ export type FilterResults = {
 const Search: React.FC<{
 	sessionId: string;
 	location: string;
-	creatorName: string;
+	creator: { name: string; hashId: string };
+	userIdHash: string;
 	voteOnRestaurant: Function;
 	isAdded: { [id: string]: boolean };
 	searchFormState: Partial<SearchFormState>;
@@ -87,7 +88,8 @@ const Search: React.FC<{
 }> = ({
 	sessionId,
 	location,
-	creatorName,
+	creator,
+	userIdHash: userHashId,
 	voteOnRestaurant,
 	isAdded,
 	searchFormState,
@@ -101,7 +103,6 @@ const Search: React.FC<{
 	let [filterResults, setFilterResults] = useState<FilterResults>();
 	const updateFilter = useCallback(
 		(r: FilterResults) => {
-			console.log(`filter sent: ${JSON.stringify(r)}`);
 			setFilterResults(r);
 		},
 		[setFilterResults]
@@ -139,7 +140,8 @@ const Search: React.FC<{
 				}}
 			>
 				<div className="text-theme-light-gray italic -mt-1">
-					{creatorName} set the location to{" "}
+					{creator?.hashId === userHashId ? "You" : creator?.name} set the
+					location to{" "}
 					<span className="uppercase text-sm font-bold">
 						{location}
 						<button

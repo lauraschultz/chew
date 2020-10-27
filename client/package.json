@@ -1,57 +1,60 @@
 {
-  "name": "client",
-  "homepage": "/chew/",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.30",
-    "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "@fortawesome/react-fontawesome": "^0.1.11",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.55",
-    "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-router-dom": "^5.1.5",
-    "@types/socket.io-client": "^1.4.33",
-    "axios": "^0.20.0",
-    "history": "^5.0.0",
-    "lodash": "^4.17.20",
-    "netlify-cli": "^2.65.7",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-media": "^1.10.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3",
-    "rxjs": "^6.6.3",
-    "socket.io-client": "^2.3.0",
-    "tailwind": "^4.0.0",
-    "typescript": "^3.7.5"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@types/googlemaps": "^3.40.0"
-  }
+	"name": "client",
+	"homepage": "/chew/",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@fortawesome/fontawesome-svg-core": "^1.2.30",
+		"@fortawesome/free-solid-svg-icons": "^5.14.0",
+		"@fortawesome/react-fontawesome": "^0.1.11",
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.5.0",
+		"@testing-library/user-event": "^7.2.1",
+		"@types/blueimp-md5": "^2.7.0",
+		"@types/jest": "^24.9.1",
+		"@types/node": "^12.12.55",
+		"@types/react": "^16.9.49",
+		"@types/react-dom": "^16.9.8",
+		"@types/react-router-dom": "^5.1.5",
+		"@types/socket.io-client": "^1.4.33",
+		"axios": "^0.20.0",
+		"blueimp-md5": "^2.18.0",
+		"history": "^5.0.0",
+		"lodash": "^4.17.20",
+		"netlify-cli": "^2.65.7",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-media": "^1.10.0",
+		"react-router-dom": "^5.2.0",
+		"react-scripts": "3.4.3",
+		"rxjs": "^6.6.3",
+		"socket.io-client": "^2.3.0",
+		"tailwind": "^4.0.0",
+		"typescript": "^3.7.5"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"build:CSS": "npx tailwindcss build tailwind.css -o src/comp.css",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"@types/googlemaps": "^3.40.0"
+	}
 }

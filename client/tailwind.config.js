@@ -44,7 +44,7 @@ module.exports = {
 	},
 	variants: {
 		margin: ["responsive", "hover", "group-hover"],
-		borderColor: ["focus", "focus-within"],
+		borderColor: ["focus", "focus-within", "hover"],
 	},
 	plugins: [require("postcss-focus-visible")],
 };

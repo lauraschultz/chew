@@ -35,20 +35,19 @@ const Login: React.FC = () => {
 							</h2>
 							<hr />
 							<label className="block my-2 mx-3">
-								{/* <FontAwesomeIcon icon={faUser} /> */}
 								<span className="uppercase font-bold text-sm">Your name:</span>
 								<div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
 									<FontAwesomeIcon icon={faUser} className="mr-2" />
 									<input
-										className="px-2 border-l "
+										className="px-2 focus:outline-none border-l"
 										type="text"
 										value={userName}
 										onChange={(e) => setUserName(e.target.value)}
+										required
 									/>
 								</div>
 							</label>
 							<label className="block my-2 mx-3">
-								{/* <FontAwesomeIcon icon={faUser} /> */}
 								<span className="uppercase font-bold text-sm">Location:</span>
 								<div
 									className={
@@ -61,6 +60,7 @@ const Login: React.FC = () => {
 										type="text"
 										value={location}
 										onChange={(e) => setLocation(e.target.value)}
+										required
 									/>
 								</div>
 								<PlacesAutocomplete

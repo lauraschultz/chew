@@ -76,10 +76,6 @@ const Filters: React.FC<{
 		return (stops[0] < n && n < stops[1]) || (stops[1] < n && n < stops[0]);
 	};
 	const priceArray = new Array(4).fill("").map((a, b) => "$".repeat(b + 1));
-	const selectedPriceStyles =
-		"bg-theme-blue text-white px-1 py-2 rounded-full z-30 ";
-	const intermediatePriceStyles =
-		"bg-theme-blue-l-3 text-black py-1 px-4 -mx-2 z-20 ";
 
 	return (
 		<>
@@ -109,9 +105,13 @@ const Filters: React.FC<{
 								key={idx}
 								onClick={() => dispatch({ key: "price", newVal: idx })}
 								className={
-									"relative px-2 btn-focus rounded-full" +
-									(state.prices.includes(idx) ? selectedPriceStyles : "") +
-									(isBetween(idx, state.prices) ? intermediatePriceStyles : "")
+									"relative px-2 btn-focus " +
+									(state.prices.includes(idx)
+										? "bg-theme-blue text-white px-1 py-2 rounded-full z-30 "
+										: "") +
+									(isBetween(idx, state.prices)
+										? "bg-theme-blue-l-3 text-black py-1 px-4 -mx-2 z-20 "
+										: "")
 								}
 							>
 								{d}

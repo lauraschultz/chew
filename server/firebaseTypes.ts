@@ -1,29 +1,27 @@
 export interface FirebaseDb {
-  [sessionId: string]: FirebaseSession;
+	[sessionId: string]: FirebaseSession;
 }
 
 export interface FirebaseSession {
-  location: string;
-  creator: string;
-  restaurants: Restaurants;
-  users: Users;
+	location: string;
+	creatorId: string;
+	restaurants: Restaurants;
+	users: Users;
 }
 
 export interface Restaurants {
-  [yelpId: string]: {
-    addedBy: string;
-    votes: Votes | false;
-  };
+	[yelpId: string]: {
+		addedBy: string;
+		votes: Votes | false;
+	};
 }
 
 export interface Votes {
-  [userId: string]: number;
+	[userId: string]: number;
 }
 
 export interface Users {
-  [userId: string]:
-    | {
-        name: string;
-      }
-    | false;
+	[userId: string]: {
+		name: string;
+	};
 }

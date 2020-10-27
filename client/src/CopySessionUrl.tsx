@@ -1,14 +1,12 @@
 import { faClipboard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 const CopySessionUrl: React.FC<{
 	inputThemes: string;
 	buttonThemes: string;
 	buttonShadowColor: string;
 }> = ({ inputThemes, buttonThemes, buttonShadowColor }) => {
-	let appLoc = useLocation();
 	let copyTextRef = useRef<HTMLInputElement>(null);
 	let [copied, setCopied] = useState(false);
 
