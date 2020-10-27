@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/chew/static/css/main.074232d7.chunk.css",
+    "main.css": "/chew/static/css/main.02532ca0.chunk.css",
     "main.js": "/chew/static/js/main.487d37f8.chunk.js",
     "main.js.map": "/chew/static/js/main.487d37f8.chunk.js.map",
     "runtime-main.js": "/chew/static/js/runtime-main.f2e8438a.js",
@@ -8,9 +8,9 @@
     "static/js/2.4b5a4462.chunk.js": "/chew/static/js/2.4b5a4462.chunk.js",
     "static/js/2.4b5a4462.chunk.js.map": "/chew/static/js/2.4b5a4462.chunk.js.map",
     "index.html": "/chew/index.html",
-    "precache-manifest.f3bccbf6de62c125d4a55f948888ec97.js": "/chew/precache-manifest.f3bccbf6de62c125d4a55f948888ec97.js",
+    "precache-manifest.767e1198d5c13e6b5304a15293600052.js": "/chew/precache-manifest.767e1198d5c13e6b5304a15293600052.js",
     "service-worker.js": "/chew/service-worker.js",
-    "static/css/main.074232d7.chunk.css.map": "/chew/static/css/main.074232d7.chunk.css.map",
+    "static/css/main.02532ca0.chunk.css.map": "/chew/static/css/main.02532ca0.chunk.css.map",
     "static/js/2.4b5a4462.chunk.js.LICENSE.txt": "/chew/static/js/2.4b5a4462.chunk.js.LICENSE.txt",
     "static/media/chew_logo.svg": "/chew/static/media/chew_logo.7c4b5fba.svg",
     "static/media/corner.svg": "/chew/static/media/corner.fc300196.svg",
@@ -23,7 +23,7 @@
   "entrypoints": [
     "static/js/runtime-main.f2e8438a.js",
     "static/js/2.4b5a4462.chunk.js",
-    "static/css/main.074232d7.chunk.css",
+    "static/css/main.02532ca0.chunk.css",
     "static/js/main.487d37f8.chunk.js"
   ]
 }
