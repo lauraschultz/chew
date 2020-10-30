@@ -68,7 +68,7 @@ const AppTemplate: React.FC = () => {
 		setCreator,
 		setPreviousVotes,
 	} = useContext(UserContext);
-	let [isAdded, setIsAdded] = useState<{ [id: string]: boolean }>({});
+	// let [isAdded, setIsAdded] = useState<{ [id: string]: boolean }>({});
 	let [loaded, setLoaded] = useState(false);
 	let [showVotingToast, setShowVotingToast] = useState(false);
 	let [showShareSessionModal, setShowShareSessionModal] = useState(false);
@@ -92,8 +92,11 @@ const AppTemplate: React.FC = () => {
 				setAddedRestaurants((r) => {
 					let clone = Object.assign({}, r);
 					delete clone[response.restaurantId];
-					console.log(`restId is ${response.restaurantId}`);
-					console.log(`setting addedrestaurants to ${JSON.stringify(clone)}`);
+					return clone;
+				});
+				setPreviousVotes((r: { [restId: string]: number }) => {
+					let clone = Object.assign({}, r);
+					delete clone[response.restaurantId];
 					return clone;
 				});
 			}
@@ -130,7 +133,7 @@ const AppTemplate: React.FC = () => {
 		<div className="flex-1 pt-4">
 			<Search
 				voteOnRestaurant={voteOnRestaurant}
-				isAdded={isAdded}
+				isAdded={addedRestaurants}
 				userIdHash={userIdHash}
 				sessionId={sessionId}
 				location={location}
@@ -150,13 +153,13 @@ const AppTemplate: React.FC = () => {
 		</div>
 	);
 
-	useEffect(() => {
-		const newIsAdded: { [id: string]: boolean } = {};
-		Object.keys(addedRestaurants).forEach(
-			(restId) => (newIsAdded[restId] = true)
-		);
-		setIsAdded(newIsAdded);
-	}, [addedRestaurants]);
+	// useEffect(() => {
+	// 	const newIsAdded: { [id: string]: boolean } = {};
+	// 	Object.keys(addedRestaurants).forEach(
+	// 		(restId) => (newIsAdded[restId] = true)
+	// 	);
+	// 	setIsAdded(newIsAdded);
+	// }, [addedRestaurants]);
 
 	useEffect(() => {
 		if (window.history?.state?.fromLogin) {

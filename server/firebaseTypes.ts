@@ -4,6 +4,8 @@ export interface FirebaseDb {
 
 export interface FirebaseSession {
 	location: string;
+	lat: string;
+	lng: string;
 	creatorId: string;
 	restaurants: Restaurants;
 	users: Users;

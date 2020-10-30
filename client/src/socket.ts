@@ -81,6 +81,14 @@ export class Socket {
 				.then((result) => resolve(result.data))
 		);
 
+	autocomplete = (sessionId: string, searchTerm: string): Promise<string[]> => {
+		return new Promise((resolve, reject) =>
+			axios
+				.get(`${SERVER}/autocomplete/${sessionId}/${searchTerm}`)
+				.then((result) => resolve(result.data))
+		);
+	};
+
 	emit = (data: any, callback: (p: any) => void, title: string) => {
 		console.log(`socket emitting ${title} with data ${JSON.stringify(data)}`);
 		this.socket.emit(title, data, callback);

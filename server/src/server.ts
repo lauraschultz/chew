@@ -2,7 +2,7 @@ import express from "express";
 import axios, { AxiosPromise } from "axios";
 import firebase from "firebase";
 import socket from "socket.io";
-import { firebaseConfig, yelpApiKey } from "../config";
+import { firebaseConfig, googleCloudApiKey, yelpApiKey } from "../config";
 import { FirebaseDb, FirebaseSession, Users, Votes } from "../firebaseTypes";
 import {
 	Business,
@@ -17,9 +17,12 @@ import md5 from "blueimp-md5";
 
 const PORT = process.env.PORT || 4000;
 const VOTE_VALUES = 4;
+const TIME_BETWEEN_REQUESTS = 190;
 
 let restaurantCache: { [yelpId: string]: Business } = {};
+console.log(`resetting restCache.`);
 let sessionCache: FirebaseDb = {};
+let requestTimer;
 
 firebase.initializeApp(firebaseConfig);
 let database = firebase.database(),
@@ -83,8 +86,9 @@ app.post(
 	"/addRestaurant/:sessionId/:userId/:restaurantId",
 	async (req: express.Request, res: express.Response) => {
 		const { sessionId, userId, restaurantId } = req.params;
-		await addRestaurant(sessionId, userId, restaurantId);
-		res.send(true);
+		await addRestaurant(sessionId, userId, restaurantId).then((r) =>
+			res.send(r)
+		);
 	}
 );
 
@@ -94,6 +98,16 @@ app.post(
 		const { sessionId, userId, restaurantId } = req.params;
 		await removeRestaurant(sessionId, userId, restaurantId);
 		res.send(true);
+	}
+);
+
+app.get(
+	"/autocomplete/:sessionId/:searchTerm",
+	(req: express.Request, res: express.Response) => {
+		const { sessionId, searchTerm } = req.params;
+		autocomplete(searchTerm, sessionId)
+			.then((result) => res.send(result))
+			.catch(() => res.send([]));
 	}
 );
 
@@ -112,7 +126,7 @@ io.on("connection", function (socket) {
 	// socket.on("voteOnRestaurant", voteOnRestaurant);
 });
 
-const newSession = (
+const newSession = async (
 	data: NewSessionData,
 	callback: NewSessionCallback,
 	socket: socket.Socket
@@ -123,8 +137,14 @@ const newSession = (
 	console.log(`socket ${socket.id} joined ${sessionId}.`);
 	const userId = data.userId || generateUserId();
 	// new session in cache
+	const latLng = (await getLatLngFromAddress(data.location)) || {
+		lat: undefined,
+		lng: undefined,
+	};
 	sessionCache[sessionId] = {
 		location: data.location,
+		lat: latLng.lat,
+		lng: latLng.lng,
 		creatorId: userId,
 		users: {
 			[userId]: { name: data.userName },
@@ -136,6 +156,8 @@ const newSession = (
 		.update({
 			[sessionId]: {
 				location: data.location,
+				lat: latLng.lat,
+				lng: latLng.lng,
 				creatorId: userId,
 				restaurants: false,
 				users: { [userId]: { name: data.userName } },
@@ -254,80 +276,99 @@ const addVote = async (
 		});
 };
 
-const addRestaurant = async (
+const addRestaurant = (
 	sessionId: string,
 	userId: string,
 	restaurantId: string
-) => {
-	await refreshCache(sessionId);
-	// update in cache
-	if (sessionCache[sessionId].restaurants) {
-		sessionCache[sessionId].restaurants[restaurantId] = {
-			addedBy: userId,
-			votes: false,
-		};
-	} else {
-		sessionCache[sessionId].restaurants = {
-			[restaurantId]: { addedBy: userId, votes: false },
-		};
-	}
-	// update in firebase
-	rootRef
-		.child(`${sessionId}/restaurants`)
-		.update({
-			[restaurantId]: sessionCache[sessionId].restaurants[restaurantId],
-		})
-		.then();
-	console.log("emitting addedRestaurant");
-	io.in(sessionId).emit("addedRestaurant", {
-		business: await memoizedGetRestaurantById(restaurantId),
-		votes: new Array(VOTE_VALUES),
-		addedBy: {
-			name: getUserNameById(userId, sessionCache[sessionId].users),
-			hashId: md5(userId),
-		},
+): Promise<boolean> => {
+	return new Promise(async (resolve, reject) => {
+		await refreshCache(sessionId);
+		if (sessionCache[sessionId] && sessionCache[sessionId].users[userId]) {
+			// update in cache
+			if (sessionCache[sessionId].restaurants) {
+				sessionCache[sessionId].restaurants[restaurantId] = {
+					addedBy: userId,
+					votes: false,
+				};
+			} else {
+				sessionCache[sessionId].restaurants = {
+					[restaurantId]: { addedBy: userId, votes: false },
+				};
+			}
+			// update in firebase
+			rootRef
+				.child(`${sessionId}/restaurants`)
+				.update({
+					[restaurantId]: sessionCache[sessionId].restaurants[restaurantId],
+				})
+				.then();
+			console.log("emitting addedRestaurant");
+			io.in(sessionId).emit("addedRestaurant", {
+				business: await memoizedGetRestaurantById(restaurantId),
+				votes: new Array(VOTE_VALUES),
+				addedBy: {
+					name: getUserNameById(userId, sessionCache[sessionId].users),
+					hashId: md5(userId),
+				},
+			});
+			resolve(true);
+		} else {
+			resolve(false);
+		}
 	});
 };
 
-const removeRestaurant = async (
+const removeRestaurant = (
 	sessionId: string,
 	userId: string,
 	restaurantId: string
-) => {
+): Promise<boolean> => {
 	console.log(
 		`remove restaurant: ${JSON.stringify({ sessionId, userId, restaurantId })}`
 	);
-	await refreshCache(sessionId);
-	// update in cache
-	if (sessionCache[sessionId].restaurants) {
-		delete sessionCache[sessionId].restaurants[restaurantId];
-	}
+	return new Promise(async (resolve, reject) => {
+		await refreshCache(sessionId);
+		if (
+			sessionCache[sessionId].restaurants &&
+			sessionCache[sessionId].restaurants[restaurantId].addedBy === userId
+		) {
+			// update in cache
+			delete sessionCache[sessionId].restaurants[restaurantId];
+			// update in firebase
+			rootRef.child(`${sessionId}/restaurants/${restaurantId}`).remove().then();
+			console.log("emitting removedRestaurant");
+			io.in(sessionId).emit("removedRestaurant", {
+				restaurantId,
+			});
+			resolve(true);
+		}
 
-	// update in firebase
-	rootRef.child(`${sessionId}/restaurants/${restaurantId}`).remove().then();
-	console.log("emitting removedRestaurant");
-	io.in(sessionId).emit("removedRestaurant", {
-		restaurantId,
+		resolve(false);
 	});
 };
 
-let yelpFusion = (url: string): AxiosPromise => {
+let yelpFusion = (url: string, retry?: boolean): AxiosPromise => {
 	console.log(`sending ${url}`);
 	return new Promise((resolve, reject) =>
-		axios({
-			method: "GET",
-			url: url,
-			headers: {
-				authorization: `Bearer ${yelpApiKey}`,
-				"Content-Type": "application/json",
-			},
-		})
-			.then((r) => resolve(r))
-			.catch(() => reject())
+		setTimeout(() => {
+			axios({
+				method: "GET",
+				url: encodeURI(url),
+				headers: {
+					authorization: `Bearer ${yelpApiKey}`,
+					"Content-Type": "application/json",
+				},
+			})
+				.then((r) => resolve(r))
+				.catch((e) => {
+					console.log(`yelp fusion request rejected: ${JSON.stringify(e)}`);
+					reject();
+				});
+		}, TIME_BETWEEN_REQUESTS)
 	);
 };
 
-let yelpGql = (query: string) =>
+let yelpGql = (query: string): AxiosPromise<any> =>
 	axios({
 		url: "https://api.yelp.com/v3/graphql",
 		headers: {
@@ -338,18 +379,50 @@ let yelpGql = (query: string) =>
 		data: query,
 	});
 
-let getRestaurantById = (id: string): Promise<Business> =>
-	new Promise((resolve, reject) =>
-		yelpFusion(`https://api.yelp.com/v3/businesses/${id}`).then((result) => {
-			console.log(
-				`response from yelp api: ${result.status}, ${result.statusText}`
-			);
-			if (result.status > 200 || result.status > 299) {
-				console.log(`request from yelp api rejected: ${result.statusText}`);
+let autocomplete = async (
+	text: string,
+	sessionId: string
+): Promise<string[]> => {
+	await refreshCache(sessionId);
+	return new Promise((resolve, reject) =>
+		yelpFusion(
+			`https://api.yelp.com/v3/autocomplete?text=${text}&latitude=${sessionCache[sessionId].lat}&longitude=${sessionCache[sessionId].lng}`
+		).then((result) => {
+			if (result.status === 200) {
+				const terms = result.data.terms.map((term: any) => term.text);
+				const businesses = result.data.businesses.map(
+					(business: any) => business.name
+				);
+				const categories = result.data.categories.map(
+					(category: any) => category.title
+				);
+
+				resolve(terms.concat(businesses, categories));
+			} else {
 				reject();
 			}
-			resolve(result.data as Business);
 		})
+	);
+};
+
+let getRestaurantById = (id: string): Promise<Business> =>
+	new Promise((resolve, reject) =>
+		yelpFusion(`https://api.yelp.com/v3/businesses/${id}`)
+			.then((result) => {
+				if (result.status > 200 || result.status > 299) {
+					console.log(`request from yelp api rejected: ${result.statusText}`);
+					reject();
+				}
+				restaurantCache[(result.data as Business).id] = result.data;
+				console.log(
+					`business added to restCache: ${(result.data as Business).id}`
+				);
+				resolve(result.data as Business);
+			})
+			.catch((e) => {
+				console.log(`error getting business ${id}`);
+				reject();
+			})
 	);
 
 let memoizedGetRestaurantById = (id: string): Promise<Business> => {
@@ -360,6 +433,29 @@ let memoizedGetRestaurantById = (id: string): Promise<Business> => {
 	return getRestaurantById(id);
 };
 
+let getLatLngFromAddress = (
+	address: string
+): Promise<{ lat: string; lng: string }> =>
+	new Promise((resolve, reject) =>
+		axios({
+			method: "GET",
+			url: encodeURI(
+				`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${googleCloudApiKey}`
+			),
+		})
+			.then((result) => {
+				if (result.data.status === "OK") {
+					// console.log(JSON.stringify(result.data));
+					resolve(result.data.results[0].geometry.location);
+				} else {
+					reject();
+				}
+			})
+			.catch(() => {
+				console.log("geocoding request failed.");
+				reject();
+			})
+	);
 let isOpenLaterToday = (business: Business): boolean => {
 	if (!business.hours[0].open) {
 		return true;
@@ -385,7 +481,6 @@ let getHours = (
 	const request = `{ 
    ${businesses.map((b) => {
 			const newId = "b_" + b.id.replace(/-/gi, dashReplacement);
-			// console.log(`new id is ${newId}`)
 			return `
       ${newId}: business(id: "${b.id}") {
         hours {
@@ -406,11 +501,43 @@ let getHours = (
 				resolve(data.data);
 			})
 			.catch((r) => {
-				console.log(`ERROR`);
+				console.log(`error fetching hours.`);
 				reject();
 			});
 	});
 };
+
+// let getBulkBusinesses = (
+// 	businessIds: string[]
+// ): Promise<{ [b_id: string]: Business }> => {
+// 	const request = `{
+//    ${businessIds.map((b) => {
+// 			const newId = "b_" + b.replace(/-/gi, dashReplacement);
+// 			return `
+//       ${newId}: business(id: "${b}") {
+//         hours {
+//           open {
+//             day
+//             start
+//             end
+//           }
+//         }
+//       }`;
+// 		})}
+//   }`;
+//  console.log(`request is ${request}`);
+// 	return new Promise((resolve, reject) => {
+// 		yelpGql(request)
+// 			.then(({ data }) => {
+// 				// console.log(`DONE ${JSON.stringify(data)}`);
+// 				resolve(data.data);
+// 			})
+// 			.catch((r) => {
+// 				console.log(`error fetching hours.`);
+// 				reject();
+// 			});
+// 	});
+// };
 
 let restaurantSearch = (
 	searchTerm: string,
@@ -435,7 +562,18 @@ let restaurantSearch = (
 				openHours === "now"
 			}`
 		).then((result) => {
-			returnedBusinesses = result.data.businesses || [];
+			// console.log(
+			// 	`RESULTS FROM BUSINESS SEARCH: ${JSON.stringify(result.data)}`
+			// );
+			// if (result.data.total === 0) {
+			// 	console.log(`no results.`);
+			// 	resolve([]);
+			// 	return;
+			// }
+			// console.log(`got results.`);
+			returnedBusinesses = result.data.businesses;
+		});
+		if (returnedBusinesses.length > 0) {
 			returnedBusinesses
 				.filter((b: Business) => {
 					if (b.hours && openHours === "today") {
@@ -455,24 +593,25 @@ let restaurantSearch = (
 					return false;
 					// return b.transactions.filter(t => services.split(",").includes(t)).length > 0
 				});
-		});
-		await getHours(returnedBusinesses).then((hours) => {
-			returnedBusinesses = returnedBusinesses.map(
-				(b) =>
-					({
-						...b,
-						hours: hours[`b_${b.id.replace(/-/gi, dashReplacement)}`].hours,
-					} as Business)
+			await getHours(returnedBusinesses).then((hours) => {
+				returnedBusinesses = returnedBusinesses.map(
+					(b) =>
+						({
+							...b,
+							hours: hours[`b_${b.id.replace(/-/gi, dashReplacement)}`].hours,
+						} as Business)
+				);
+			});
+			console.log(
+				`returnedbusinesses are now ${JSON.stringify(returnedBusinesses)}`
 			);
-		});
-		console.log(
-			`returnedbusinesses are now ${JSON.stringify(returnedBusinesses)}`
-		);
-		resolve(returnedBusinesses);
-		console.log("here:)");
-		returnedBusinesses.forEach((b: Business) => {
-			restaurantCache[b.id] = b;
-		});
+			resolve(returnedBusinesses);
+			returnedBusinesses.forEach((b: Business) => {
+				restaurantCache[b.id] = b;
+			});
+		} else {
+			resolve([]);
+		}
 	});
 };
 
@@ -492,22 +631,32 @@ const refreshCache = async (sessionId: string) => {
 	}
 	console.log(`dbSessionObj is ${JSON.stringify(dbSessionObj)}`);
 	sessionCache[sessionId] = dbSessionObj;
-	restaurantCache =
-		(await (Promise as any)
-			.allSettled(
-				Object.keys(dbSessionObj.restaurants).map(memoizedGetRestaurantById)
-			)
-			.then((results: any) => {
-				results
-					.filter((r: any) => r.status === "fulfilled")
-					.map((r: any) => {
-						// console.log(`current value in map: ${JSON.stringify(r.value)}`);
-						return r.value;
-					})
-					.reduce((obj: any, cur: any) => {
-						return { ...obj, [cur.id]: cur };
-					}, {});
-			})) || {};
+	await (Promise as any)
+		.allSettled(
+			Object.keys(dbSessionObj.restaurants).map((id, idx) => {
+				if (restaurantCache[id]) {
+					return new Promise((resolve, reject) => resolve(restaurantCache[id]));
+				}
+				return new Promise((resolve, reject) =>
+					setTimeout(() => {
+						resolve(memoizedGetRestaurantById(id));
+					}, idx * TIME_BETWEEN_REQUESTS)
+				);
+			})
+		)
+		.then();
+	// 	(results: any) => {
+	// 	console.log(`PROMISES ALL DONE`);
+	// 	results
+	// 		.filter((r: any) => r.status === "fulfilled")
+	// 		.map((r: any) => {
+	// 			return r.value;
+	// 		})
+	// 		.reduce((obj: any, cur: any) => {
+	// 			return { ...obj, [cur.id]: cur };
+	// 		}, {});
+	// })
+
 	console.log("done refreshing cache.");
 };
 
@@ -519,19 +668,17 @@ const generateUserId = (): string => rootRef.child("users").push().key!;
 const joinRestaurants = async (
 	sessionId: string
 ): Promise<{ [id: string]: BusinessWithVotes }> => {
+	console.log(`starting joinrestaurants`);
 	await refreshCache(sessionId);
 	return new Promise((resolve, reject) => {
 		(Promise as any)
 			.allSettled(
 				Object.entries(sessionCache[sessionId].restaurants).map(
 					async ([rId, restaurantInfo]) => {
-						console.log(
-							`join map fn: ${JSON.stringify({ rId, votes: restaurantInfo })}`
-						);
 						const addedByUserId =
 							sessionCache[sessionId].restaurants[rId].addedBy;
 						return {
-							business: await memoizedGetRestaurantById(rId),
+							business: await memoizedGetRestaurantById(rId), //restaurantCache[rId],
 							votes: shapeVotes(
 								// sessionCache[sessionId].restaurants[rId],
 								restaurantInfo.votes,
@@ -549,10 +696,9 @@ const joinRestaurants = async (
 				)
 			)
 			.then((result: BusinessWithVotes[]) => {
-				console.log(`resolving all promises`);
-				// {console.log(`result of promise.allsettled: ${JSON.stringify(result)}`)
 				resolve(
 					result
+						.filter((r: any) => r.status === "fulfilled")
 						.map((r: any) => r.value)
 						.reduce((obj: any, cur: any) => {
 							// console.log(`reduce: cur is ${JSON.stringify(cur)}`);
@@ -576,8 +722,6 @@ const shapeVotes = (votes: Votes | false, users: Users): string[] => {
 		return voteArr;
 	}
 	Object.entries(votes).forEach(([userId, v]) => {
-		console.log(`shape votes beginning`);
-		console.log(JSON.stringify({ userId, v }));
 		if (users[userId]) {
 			const name = (users[userId] as { name: string }).name;
 			if (voteArr[v]) {
@@ -587,6 +731,5 @@ const shapeVotes = (votes: Votes | false, users: Users): string[] => {
 			}
 		}
 	});
-	console.log(`shape votes: ${voteArr}`);
 	return voteArr;
 };

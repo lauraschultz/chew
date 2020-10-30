@@ -5,7 +5,7 @@ import React, {
 	useEffect,
 	useCallback,
 } from "react";
-import { Business } from "../../shared/types";
+import { Business, BusinessWithVotes } from "../../shared/types";
 import Vote from "./Vote";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,11 +19,12 @@ import Filters from "./Filters";
 import AddRestaurantButton from "./AddRestaurantButton";
 import { UserContext } from "./UserDataContext";
 import { SearchFormState } from "./Templates/AppTemplate";
+import SearchAutocomplete from "./SearchAutocomplete";
 
 const DisplaySearchResults: React.FC<{
-	businesses: Business[];
+	businesses?: Business[];
 	voteOnRestaurant: Function;
-	isAdded: { [id: string]: boolean };
+	isAdded: { [id: string]: BusinessWithVotes };
 }> = ({ businesses, voteOnRestaurant, isAdded }) => {
 	let {
 		sessionId,
@@ -32,15 +33,22 @@ const DisplaySearchResults: React.FC<{
 		previousVotes,
 		setPreviousVotes,
 	} = useContext(UserContext);
+	if (businesses?.length === 0) {
+		return (
+			<div className="uppercase font-bold tracking-wide text-sm text-theme-light-gray px-6 py-2">
+				No results.
+			</div>
+		);
+	}
 	return (
 		<ul className="divide-y divide-theme-extra-light-gray">
-			{businesses.map((b) => (
+			{businesses?.map((b) => (
 				<li key={b.id}>
 					<DisplayItem
 						restaurant={{ business: b, votes: [] }}
 						addRestaurant={
 							<AddRestaurantButton
-								isRestaurantsAdded={isAdded[b.id]}
+								isRestaurantsAdded={!!isAdded[b.id]}
 								userState={userState}
 								sessionId={sessionId}
 								userId={userId}
@@ -82,7 +90,7 @@ const Search: React.FC<{
 	creator: { name: string; hashId: string };
 	userIdHash: string;
 	voteOnRestaurant: Function;
-	isAdded: { [id: string]: boolean };
+	isAdded: { [id: string]: BusinessWithVotes };
 	searchFormState: Partial<SearchFormState>;
 	updateSearchFormState: (s: Partial<SearchFormState>) => void;
 }> = ({
@@ -96,9 +104,7 @@ const Search: React.FC<{
 	updateSearchFormState,
 }) => {
 	let [searchTerm, setSearchTerm] = useState(searchFormState.search || "");
-	let [businesses, setBusinesses] = useState(
-		searchFormState.results || new Array<Business>()
-	);
+	let [businesses, setBusinesses] = useState(searchFormState.results);
 	let [loadingSearch, setLoadingSearch] = useState(false);
 	let [filterResults, setFilterResults] = useState<FilterResults>();
 	const updateFilter = useCallback(
@@ -123,7 +129,7 @@ const Search: React.FC<{
 				onSubmit={(e: FormEvent) => {
 					e.preventDefault();
 					setLoadingSearch(true);
-					setBusinesses([]);
+					setBusinesses(undefined);
 					socket
 						.search(
 							sessionId,
@@ -155,12 +161,20 @@ const Search: React.FC<{
 						</button>
 					</span>
 				</div>
-				<input
-					className="rounded py-1 px-2 shadow m-1 btn-focus"
-					type="text"
-					value={searchTerm}
-					onChange={(e) => setSearchTerm(e.target.value)}
-				></input>
+				<div className="m-1 inline-block">
+					<input
+						className="rounded py-1 px-2 shadow btn-focus"
+						type="text"
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+					/>
+					<SearchAutocomplete
+						sessionId={sessionId}
+						searchInput={searchTerm}
+						selectItem={setSearchTerm}
+					/>
+				</div>
+
 				<button
 					className="shadow py-1 px-2 m-1 text-white bg-theme-blue rounded-full btn-focus rounded-full"
 					type="submit"
