@@ -59,7 +59,7 @@ export const DisplayItem: React.FC<{
 										restaurant.business.id
 									)
 								}
-								className="mx-1 px-2 border border-theme-extra-light-gray rounded hover:bg-theme-red hover:text-white hover:border-theme-red btn-focus"
+								className="mx-1 px-2 border border-theme-extra-light-gray rounded hover:bg-theme-red hover:text-white hover:border-theme-red hover:shadow btn-focus transition-all duration-200"
 							>
 								<FontAwesomeIcon icon={faTrash} className="mr-1" />
 								remove

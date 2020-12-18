@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Vollkorn:ital,wght@0,500;1,600;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Vollkorn:ital,wght@0,500;1,600;1,700&display=swap");
 
 @tailwind base;
 
@@ -7,13 +7,10 @@
 @tailwind utilities;
 
 @layer base {
-    #root {
-        @apply flex flex-col min-h-screen bg-theme-light font-body
-    }
-    .btn-focus:focus {
-        @apply outline-none
-    }
-    .btn-focus:focus-visible {
-        @apply outline-none shadow-outline border-theme-med-gray
-    }
+	#root {
+		@apply flex flex-col min-h-screen bg-theme-light font-body;
+	}
+	.btn-focus {
+		@apply focus:outline-none focus:ring-2 focus:ring-gray-400;
+	}
 }

@@ -17,24 +17,26 @@
 		"@types/react-dom": "^16.9.8",
 		"@types/react-router-dom": "^5.1.5",
 		"@types/socket.io-client": "^1.4.33",
+		"autoprefixer": "^10.1.0",
 		"axios": "^0.20.0",
 		"blueimp-md5": "^2.18.0",
 		"history": "^5.0.0",
 		"lodash": "^4.17.20",
-		"netlify-cli": "^2.65.7",
+		"netlify-cli": "^2.69.10",
+		"postcss": "^8.2.1",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"react-media": "^1.10.0",
 		"react-router-dom": "^5.2.0",
-		"react-scripts": "3.4.3",
+		"react-scripts": "^4.0.1",
 		"rxjs": "^6.6.3",
 		"socket.io-client": "^2.3.0",
-		"tailwind": "^4.0.0",
+		"tailwindcss": "^2.0.2",
 		"typescript": "^3.7.5"
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build",
+		"build": "cross-env NODE_ENV=production npx tailwindcss build tailwind.css -o src/comp.css && react-scripts build",
 		"build:CSS": "npx tailwindcss build tailwind.css -o src/comp.css",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
@@ -55,6 +57,7 @@
 		]
 	},
 	"devDependencies": {
-		"@types/googlemaps": "^3.40.0"
+		"@types/googlemaps": "^3.40.0",
+		"cross-env": "^7.0.3"
 	}
 }

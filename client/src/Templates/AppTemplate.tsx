@@ -77,6 +77,8 @@ const AppTemplate: React.FC = () => {
 	>({});
 	let history = useHistory();
 
+	useEffect(() => console.log(addedRestaurants), [addedRestaurants]);
+
 	useEffect(() => {
 		socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
 			console.log("recieving an added restaurant.");
@@ -104,13 +106,22 @@ const AppTemplate: React.FC = () => {
 
 		socket.subscribeToVoteAdded(
 			(params: { restaurantId: string; votes: string[] }) => {
-				setAddedRestaurants((r) => ({
-					...r,
-					[params.restaurantId]: {
-						...r[params.restaurantId],
-						votes: params.votes,
-					},
-				}));
+				setAddedRestaurants(
+					(r) => {
+						const updatedRestaurants = { ...r };
+						console.log(`vote added: ${params.votes.join(" | ")}`);
+						updatedRestaurants[params.restaurantId].votes = params.votes;
+						// console.log(r[params.restaurantId].votes);
+						return { ...r, ...updatedRestaurants };
+					}
+					// ({
+					// 	...r,
+					// 	[params.restaurantId]: {
+					// 		...r[params.restaurantId],
+					// 		votes: params.votes,
+					// 	},
+					// })
+				);
 			}
 		);
 		return () => {
@@ -118,7 +129,7 @@ const AppTemplate: React.FC = () => {
 			socket.unSubscribeToRestaurantRemoved();
 			socket.unSubscribeToVoteAdded();
 		};
-	}, []);
+	}, [setPreviousVotes]);
 
 	const voteOnRestaurant = (restaurantId: string, voteNum: number) =>
 		socket.addVote(sessionId, userId, restaurantId, voteNum);

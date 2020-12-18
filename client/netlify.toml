@@ -8,18 +8,8 @@
     status = 200
 
 [[redirects]]
-    from = "/chew/logo64.png"
-    to = "/logo64.png"
-    status = 200
-
-[[redirects]]
-    from = "/chew/logo192.png"
-    to = "/logo192.png"
-    status = 200
-
-[[redirects]]
-    from = "/chew/logo512.png"
-    to = "/logo512.png"
+    from = "/chew/icons/:splat"
+    to = "/icons/:splat"
     status = 200
 
 [[redirects]]

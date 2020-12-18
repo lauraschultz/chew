@@ -15,10 +15,13 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "types": ["googlemaps"],
+    "types": [
+      "googlemaps"
+    ],
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src"

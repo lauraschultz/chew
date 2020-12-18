@@ -16,9 +16,9 @@ const Login: React.FC = () => {
 		[location, setLocation] = useState("");
 	return (
 		<>
-			<div className="flex-1 py-2 px-4 md:px-6 bg-theme-red text-gray-200 rounded-lg shadow-lg max-w-lg md:m-2 lg:mr-6">
+			<div className="flex-1 py-2 px-4 md:px-6 bg-theme-red text-gray-200 sm:rounded-lg sm:shadow-lg sm:max-w-lg md:m-2 lg:mr-6">
 				<img className="w-40" src={Logo} alt="chew logo" />
-				<p className="font-display text-lg leading-tight py-1">
+				<p className="font-display sm:text-lg leading-tight py-1">
 					Chew is the easiest way to pick a restaurant with your friends and
 					family. Simply create a session, share the link, and everyone can add
 					restaurants that they're interested in and vote on each other's
@@ -28,7 +28,7 @@ const Login: React.FC = () => {
 					{(context) => (
 						<form
 							onSubmit={(e) => context.createSession(e, userName, location)}
-							className="p-3 bg-gray-100 text-gray-600 rounded my-4 mx-4 lg:mx-6 shadow"
+							className="p-3 bg-gray-100 text-gray-600 rounded my-4 mx-1 sm:mx-4 lg:mx-6 shadow"
 						>
 							<h2 className="font-bold font-display text-xl text-gray-700 italic">
 								Create a new session:
