@@ -13,8 +13,8 @@ I wanted to build an easy way for groups of people to choose a restaurant togeth
 
 My first priority is to migrate the app from using Firebase RTDB to a relational database. As the app gets more complex I need a database that can support more complex queries and joins, which Firebase cannot.
 
-- [ ] User who added a restaurant can delete it
-- [ ] Autocomplete for restaurant search page
+- [x] User who added a restaurant can delete it
+- [x] Autocomplete for restaurant search page
 
 ---
 
