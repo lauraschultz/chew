@@ -11,7 +11,7 @@ const LoginFooter: React.FC = () => (
 			alt="decorative footer border"
 			className="hidden sm:block"
 		/>
-		<div className="bg-theme-dark-gray text-white p-2 md:px-8 md:py-4 lg:px-24 block sm:flex justify-around leading-tight items-center">
+		<div className="bg-gray-800 text-white p-2 md:px-8 md:py-4 lg:px-24 block sm:flex justify-around leading-tight items-center">
 			<Link to="/getStarted">
 				<img
 					className="hidden sm:block flex-initial w-32"

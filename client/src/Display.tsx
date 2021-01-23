@@ -18,12 +18,12 @@ const Display: React.FC<{
 		sessionId,
 	} = useContext(UserContext);
 	return (
-		<div className="divide-y divide-theme-extra-light-gray">
-			<h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none">
+		<>
+			<h2 className="max-w-md mx-auto text-2xl px-1 text-gray-800 font-display leading-none">
 				Restaurants
 			</h2>
 			{Object.keys(addedRestaurants).length === 0 && (
-				<div className="text-theme-light-gray py-2 px-4 rounded my-3 border border-theme-light-gray italic text-sm mx-auto max-w-md">
+				<div className="text-gray-500 py-2 px-4 rounded my-3 border border-gray-300 italic text-sm mx-auto max-w-md">
 					No restaurants have been added
 				</div>
 			)}
@@ -48,7 +48,7 @@ const Display: React.FC<{
 					sessionId={sessionId}
 				/>
 			))}
-		</div>
+		</>
 	);
 };
 

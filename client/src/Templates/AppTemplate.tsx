@@ -141,7 +141,7 @@ const AppTemplate: React.FC = () => {
 	);
 
 	let search: ReactFragment = (
-		<div className="flex-1 pt-4">
+		<div className="flex-1 py-4 px-2 max-w-md w-full">
 			<Search
 				voteOnRestaurant={voteOnRestaurant}
 				isAdded={addedRestaurants}
@@ -156,7 +156,7 @@ const AppTemplate: React.FC = () => {
 	);
 
 	let display: ReactFragment = (
-		<div className="flex-1 pt-4">
+		<div className="flex-1 py-4 px-2 max-w-md w-full divide-y divide-gray-300">
 			<Display
 				voteOnRestaurant={voteOnRestaurant}
 				addedRestaurants={addedRestaurants}
@@ -228,7 +228,7 @@ const AppTemplate: React.FC = () => {
 					<FontAwesomeIcon
 						icon={faCircleNotch}
 						size="5x"
-						className="animate-spin text-theme-yellow block"
+						className="animate-spin text-yellow block"
 					/>
 				</ModalContainer>
 			)}
@@ -245,7 +245,7 @@ const AppTemplate: React.FC = () => {
 						</div>
 						<div className="text-gray-700 leading-tight mt-1 px-1">
 							<span
-								className="border-b-2 border-theme-blue hover:text-theme-blue cursor-pointer"
+								className="border-b-2 border-blue hover:text-blue cursor-pointer"
 								onClick={() => {
 									setShowVotingToast(false);
 								}}
@@ -265,8 +265,8 @@ const AppTemplate: React.FC = () => {
 								<UserNameModal escape={() => setShowVotingToast(true)} />
 							</ModalContainer>
 						)}
-						<header className="bg-theme-red text-white shadow ">
-							<nav className="flex justify-between p-1 lg:py-2 lg:px-4">
+						<header className="bg-red text-white shadow ">
+							<nav className="flex justify-between p-2 md:p-4 lg:px-8">
 								<Link to="/getStarted">
 									<img
 										className="text-white inline-block w-32 lg:w-38 flex-initial"
@@ -281,7 +281,7 @@ const AppTemplate: React.FC = () => {
 									leave this group <FontAwesomeIcon icon={faDoorOpen} />
 								</Link>
 							</nav>
-							<div className="md:hidden uppercase font-bold tracking-wide py-1 text-sm bg-theme-dark-red">
+							<div className="md:hidden uppercase font-bold tracking-wide p-2 pb-1 text-sm bg-red-dark">
 								<NavLink
 									to={`/ID/${context.sessionId}`}
 									exact={true}
@@ -316,7 +316,7 @@ const AppTemplate: React.FC = () => {
 											path="/ID/:sessionId"
 											exact
 											render={() => (
-												<div className="flex justify-around px-1">
+												<div className="flex justify-around px-1 max-w-7xl mx-auto">
 													{display} {search}
 												</div>
 											)}

@@ -11,13 +11,13 @@ const CopySessionUrl: React.FC<{
 	let [copied, setCopied] = useState(false);
 
 	return (
-		<div className="w-max-content text-sm">
+		<div className="w-max-content text-sm m-1">
 			<input
 				type="text"
 				ref={copyTextRef}
 				readOnly
 				className={
-					"border rounded-l py-1 pl-2 w-32 overflow-hidden btn-focus " +
+					"border rounded-l py-1 pl-2 w-32 overflow-hidden btn-focus text-sm " +
 					inputThemes
 				}
 				value={window.location.href}

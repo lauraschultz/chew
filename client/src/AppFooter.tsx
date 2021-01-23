@@ -4,25 +4,25 @@ import Waves from "./assets/waves.svg";
 import FooterLinks from "./FooterLinks";
 
 const AppFooter: React.FC = () => (
-  <footer className="text-theme-red w-full">
-    <img src={Waves} alt="decorative footer border"/>
-    <div className="bg-theme-red text-white p-2 md:px-8 md:py-4 lg:px-24 block sm:flex justify-around leading-tight">
-      <div className="flex-initial">
-        <p className="mb-1">Share this session with others:</p>
-        <CopySessionUrl
-          buttonThemes="bg-white text-theme-red border-white"
-          buttonShadowColor="#e8505b"
-          inputThemes="border-white bg-theme-red"
-        />
-      </div>
-      <div className="flex-initial">
-        <FooterLinks />
-      </div>
+	<footer className="text-red w-full mt-4">
+		<img src={Waves} alt="" />
+		<div className="bg-red text-white p-2 md:px-4 lg:px-24 block sm:flex justify-around items-center leading-tight">
+			<div className="flex-initial p-2">
+				<p className="mb-1">Share this session with others:</p>
+				<CopySessionUrl
+					buttonThemes="bg-white text-red border-white"
+					buttonShadowColor="#e8505b"
+					inputThemes="border-white bg-red"
+				/>
+			</div>
+			<div className="flex-initial p-2 text-xs">
+				<FooterLinks />
+			</div>
 
-      {/* <Link to="">show restaurants</Link>
+			{/* <Link to="">show restaurants</Link>
           <Link to="">show search</Link> */}
-    </div>
-  </footer>
+		</div>
+	</footer>
 );
 
 export default AppFooter;

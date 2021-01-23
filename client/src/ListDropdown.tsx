@@ -51,7 +51,7 @@ const ListDropdown: React.FC<{
 						onMouseOver={(e) => setHoveredIdx(idx)}
 						className={
 							"px-2 py-1 cursor-pointer " +
-							(hoveredIdx === idx ? "bg-theme-blue-l-2 text-white" : "")
+							(hoveredIdx === idx ? "bg-blue-light2 text-white" : "")
 						}
 						onClick={() => {
 							updateSelection(i);

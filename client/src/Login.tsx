@@ -16,7 +16,7 @@ const Login: React.FC = () => {
 		[location, setLocation] = useState("");
 	return (
 		<>
-			<div className="flex-1 py-2 px-4 md:px-6 bg-theme-red text-gray-200 sm:rounded-lg sm:shadow-lg sm:max-w-lg md:m-2 lg:mr-6">
+			<div className="flex-1 p-4 md:px-6 bg-red text-gray-200 sm:rounded-lg sm:shadow-lg sm:max-w-lg md:m-2 lg:mr-6">
 				<img className="w-40" src={Logo} alt="chew logo" />
 				<p className="font-display sm:text-lg leading-tight py-1">
 					Chew is the easiest way to pick a restaurant with your friends and
@@ -28,18 +28,18 @@ const Login: React.FC = () => {
 					{(context) => (
 						<form
 							onSubmit={(e) => context.createSession(e, userName, location)}
-							className="p-3 bg-gray-100 text-gray-600 rounded my-4 mx-1 sm:mx-4 lg:mx-6 shadow"
+							className="p-3 bg-gray-100 text-gray-600 rounded my-4 sm:mx-4 lg:mx-6 shadow"
 						>
 							<h2 className="font-bold font-display text-xl text-gray-700 italic">
 								Create a new session:
 							</h2>
 							<hr />
-							<label className="block my-2 mx-3">
+							<label className="block my-3 mx-3">
 								<span className="uppercase font-bold text-sm">Your name:</span>
-								<div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content">
+								<div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-blue-light2 w-max-content">
 									<FontAwesomeIcon icon={faUser} className="mr-2" />
 									<input
-										className="px-2 focus:outline-none border-l"
+										className="px-2 focus:ring-0 border-0 border-l border-gray-300 focus:border-gray-300 py-0"
 										type="text"
 										value={userName}
 										onChange={(e) => setUserName(e.target.value)}
@@ -47,16 +47,16 @@ const Login: React.FC = () => {
 									/>
 								</div>
 							</label>
-							<label className="block my-2 mx-3">
+							<label className="block my-3 mx-3">
 								<span className="uppercase font-bold text-sm">Location:</span>
 								<div
 									className={
-										"py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-theme-blue-l-2 w-max-content "
+										"py-1 px-2 rounded border border-gray-300 focus:border-gray-300 bg-white focus-within:border-blue-light2 w-max-content "
 									}
 								>
 									<FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
 									<input
-										className="px-2 focus:outline-none border-l"
+										className="px-2 focus:ring-0 border-0 border-l border-gray-300 focus:border-gray-300 py-0"
 										type="text"
 										value={location}
 										onChange={(e) => setLocation(e.target.value)}
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
 							<div className="relative overflow-hidden group text-white">
 								<button
 									type="submit"
-									className="block w-full p-2 uppercase font-bold tracking-wide bg-theme-yellow hover:bg-theme-dark-yellow rounded shadow btn-focus"
+									className="block w-full p-2 uppercase font-bold tracking-wide bg-yellow hover:bg-yellow-dark rounded shadow btn-focus"
 								>
 									create
 								</button>{" "}
@@ -117,7 +117,7 @@ const Login: React.FC = () => {
 						</form>
 					)}
 				</UserContextConsumer>
-				<div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 m-2 md:my-4 md:mx-8 rounded shadow leading-tight">
+				<div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 mx-4 md:my-4 md:mx-8 rounded shadow leading-tight">
 					If you are trying to join someone else's session, copy and paste the
 					session link to your browser.
 				</div>

@@ -81,24 +81,24 @@ const Filters: React.FC<{
 		<>
 			<button
 				type="button"
-				className="m-1 px-2 py-1 text-theme-blue border border-theme-blue bg-white rounded shadow font-bold text-sm uppercase tracking-wide btn-focus"
+				className="ml-1 px-2 py-1 text-blueGray border border-blue bg-white rounded shadow font-bold text-sm uppercase tracking-wide btn-focus flex-inital whitespace-nowrap"
 				onClick={() => setShowFilters(!showFilters)}
 			>
 				<FontAwesomeIcon icon={faSlidersH} className="mr-2" />
-				{showFilters ? "hide" : "show"} filters
+				filters
 			</button>
 			<div
 				className={
-					"px-2 pb-2 flex flex-wrap border-b border-theme-extra-light-gray " +
+					"p-2 mt-10 mx-2 absolute border border-gray-300 rounded bg-white z-40 left-0 right-0 " +
 					(showFilters ? "" : "hidden")
 				}
 			>
 				<div className="w-full sm:w-1/2">
-					<span className="text-sm font-bold uppercase tracking-wide text-theme-med-gray">
+					<span className="text-sm font-bold uppercase tracking-wide text-gray-500">
 						Price Range
 					</span>
 
-					<div className="group mt-1 ml-2 mb-3 text-sm">
+					<div className="group mt-1 ml-2 mb-3 text-sm whitespace-nowrap">
 						{priceArray.map((d, idx) => (
 							<button
 								type="button"
@@ -107,10 +107,10 @@ const Filters: React.FC<{
 								className={
 									"relative px-2 btn-focus " +
 									(state.prices.includes(idx)
-										? "bg-theme-blue text-white px-1 py-2 rounded-full z-30 "
+										? "bg-blueGray text-white px-1 py-2 rounded-full z-30 "
 										: "") +
 									(isBetween(idx, state.prices)
-										? "bg-theme-blue-l-3 text-black py-1 px-4 -mx-2 z-20 "
+										? "bg-blueGray-light text-gray-800 py-1 px-4 -mx-2 z-20 "
 										: "")
 								}
 							>
@@ -118,12 +118,12 @@ const Filters: React.FC<{
 							</button>
 						))}
 					</div>
-					<span className="text-sm font-bold uppercase tracking-wide text-theme-med-gray">
+					<span className="text-sm font-bold uppercase tracking-wide text-gray-500">
 						Open Hours
 					</span>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus rounded-full"
+							className="mr-1 btn-focus rounded-full text-blueGray"
 							checked={state.openDate === "any"}
 							type="radio"
 							name="day"
@@ -133,16 +133,16 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus rounded-full"
+							className="mr-1 btn-focus rounded-full  text-blueGray"
 							checked={state.openDate === "today"}
 							type="radio"
 							name="day"
 							onChange={() => dispatch({ newVal: "today", key: "openDate" })}
 						/>
 						Today
-						<label className="block px-4 -mt-1 mb-2">
+						<label className="block px-4 -mt-1 mb-2 ">
 							<input
-								className="mr-1 btn-focus"
+								className="mr-1 btn-focus rounded text-blueGray"
 								checked={state.openNow}
 								type="checkbox"
 								onChange={() => dispatch({ key: "openNow" })}
@@ -152,12 +152,12 @@ const Filters: React.FC<{
 					</label>
 				</div>
 				<div className="w-full sm:w-1/2">
-					<span className="text-sm font-bold uppercase tracking-wide text-theme-med-gray">
+					<span className="text-sm font-bold uppercase tracking-wide text-gray-500">
 						Services Offered
 					</span>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus"
+							className="mr-1 btn-focus  rounded text-blueGray"
 							checked={state.services.pickup}
 							type="checkbox"
 							onChange={() => dispatch({ key: "pickup" })}
@@ -166,7 +166,7 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus"
+							className="mr-1 btn-focus  rounded text-blueGray"
 							checked={state.services.delivery}
 							type="checkbox"
 							onChange={() => dispatch({ key: "delivery" })}
@@ -175,7 +175,7 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus"
+							className="mr-1 btn-focus  rounded text-blueGray"
 							checked={state.services.restaurant_reservation}
 							type="checkbox"
 							onChange={() => dispatch({ key: "restaurant_reservation" })}

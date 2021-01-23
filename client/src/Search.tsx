@@ -35,16 +35,17 @@ const DisplaySearchResults: React.FC<{
 	} = useContext(UserContext);
 	if (businesses?.length === 0) {
 		return (
-			<div className="uppercase font-bold tracking-wide text-sm text-theme-light-gray px-6 py-2">
+			<div className="uppercase font-bold tracking-wide text-sm text-gray-500 px-6 py-2">
 				No results.
 			</div>
 		);
 	}
 	return (
-		<ul className="divide-y divide-theme-extra-light-gray">
+		<ul className="divide-y divide-gray-300">
 			{businesses?.map((b) => (
 				<li key={b.id}>
 					<DisplayItem
+						key={b.id}
 						restaurant={{ business: b, votes: [] }}
 						addRestaurant={
 							<AddRestaurantButton
@@ -119,13 +120,29 @@ const Search: React.FC<{
 	}, [searchTerm, businesses, updateSearchFormState]);
 
 	return (
-		<div className="max-w-md w-full mx-auto">
-			<h2 className="max-w-md mx-auto text-2xl px-1 text-theme-dark-gray font-display leading-none mb-1">
+		<>
+			<h2 className="max-w-md mx-auto text-2xl px-1 text-gray-800 font-display leading-none mb-1">
 				Search
 			</h2>
-			<hr className="border-theme-extra-light-gray" />
+			<hr className="border-gray-300" />
+			<div className="text-gray-500 italic m-2">
+				{creator?.hashId === userHashId ? "You" : creator?.name} set the
+				location to{" "}
+				<span className="uppercase text-sm font-bold">
+					{location}
+					<button
+						type="button"
+						aria-label="Search results will not be strictly within this area; it serves as a starting point."
+						data-balloon-pos="down"
+						data-balloon-length="medium"
+						className="btn-focus rounded-full"
+					>
+						<FontAwesomeIcon icon={faInfoCircle} className="ml-1" />
+					</button>
+				</span>
+			</div>
 			<form
-				className="p-2 w-full"
+				className="p-2 w-full flex relative items-stretch"
 				onSubmit={(e: FormEvent) => {
 					e.preventDefault();
 					setLoadingSearch(true);
@@ -145,38 +162,22 @@ const Search: React.FC<{
 						.catch((e) => console.log(`oopsies ${e}`));
 				}}
 			>
-				<div className="text-theme-light-gray italic -mt-1">
-					{creator?.hashId === userHashId ? "You" : creator?.name} set the
-					location to{" "}
-					<span className="uppercase text-sm font-bold">
-						{location}
-						<button
-							type="button"
-							aria-label="Search results will not be strictly within this area; it serves as a starting point."
-							data-balloon-pos="down"
-							data-balloon-length="medium"
-							className="btn-focus rounded-full"
-						>
-							<FontAwesomeIcon icon={faInfoCircle} className="ml-1" />
-						</button>
-					</span>
-				</div>
-				<div className="m-1 inline-block">
+				<div className="flex-1 inline-block">
 					<input
-						className="rounded py-1 px-2 shadow btn-focus"
+						className="rounded-l py-1 px-2 shadow btn-focus w-full border-y border-l border-gray-300 focus:border-gray-300"
 						type="text"
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 					/>
+
 					<SearchAutocomplete
 						sessionId={sessionId}
 						searchInput={searchTerm}
 						selectItem={setSearchTerm}
 					/>
 				</div>
-
 				<button
-					className="shadow py-1 px-2 m-1 text-white bg-theme-blue rounded-full btn-focus rounded-full"
+					className="shadow py-1 px-2 text-white bg-blue rounded-r btn-focus flex-initial"
 					type="submit"
 				>
 					<FontAwesomeIcon aria-label="search" icon={faSearch} />
@@ -191,7 +192,7 @@ const Search: React.FC<{
 				<FontAwesomeIcon
 					icon={faCircleNotch}
 					size="5x"
-					className="animate-spin text-theme-yellow mx-auto my-4 block"
+					className="animate-spin text-yellow mx-auto my-4 block"
 				/>
 			)}
 			<DisplaySearchResults
@@ -199,7 +200,7 @@ const Search: React.FC<{
 				voteOnRestaurant={voteOnRestaurant}
 				isAdded={isAdded}
 			/>
-		</div>
+		</>
 	);
 };
 

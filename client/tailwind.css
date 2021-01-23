@@ -7,8 +7,11 @@
 @tailwind utilities;
 
 @layer base {
+	body {
+		@apply bg-red;
+	}
 	#root {
-		@apply flex flex-col min-h-screen bg-theme-light font-body;
+		@apply flex flex-col min-h-screen bg-gray-100 font-body;
 	}
 	.btn-focus {
 		@apply focus:outline-none focus:ring-2 focus:ring-gray-400;
