@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { googleCloudApiKey } from "./config";
 import ListDropdown from "./ListDropdown";
+import poweredByGoogle from "./assets/powered_by_google_on_white.png";
 
 let autoComplete: google.maps.places.AutocompleteService;
 
@@ -31,7 +31,7 @@ const PlacesAutocomplete: React.FC<{
 
 	useEffect(() => {
 		loadScript(
-			`https://maps.googleapis.com/maps/api/js?key=${googleCloudApiKey}&libraries=places`,
+			`https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_CLOUD_API_KEY}&libraries=places`,
 			() => handleScriptLoad()
 		);
 	}, []);
@@ -78,7 +78,6 @@ const PlacesAutocomplete: React.FC<{
 		[selectPlace]
 	);
 
-	const poweredByGoogle = require("./assets/powered_by_google_on_white.png");
 	if (selectedText.current === searchTerm) {
 		return null;
 	}

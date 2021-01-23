@@ -7,7 +7,7 @@ import {
 	Business,
 } from "../../shared/types";
 import axios from "axios";
-import { SERVER } from "./config";
+const SERVER = process.env.REACT_APP_SERVER || "localhost:4000";
 
 export class Socket {
 	socket: SocketIOClient.Socket;

@@ -7,30 +7,31 @@ import "./comp.css";
 import { UserContextProvider } from "./UserDataContext";
 import FourOhFour from "./404";
 import TOS from "./TOS";
+require("dotenv").config();
 
 const App: React.FC = () => (
-  <UserContextProvider>
-    <Switch>
-      <Route path="/getStarted" exact>
-        <LoginTemplate>
-          <Login />
-        </LoginTemplate>
-      </Route>
-      <Route path="/ID/:sessionId" render={() => <AppTemplate />}></Route>
-      <Route path="/404" exact>
-        <FourOhFour />
-      </Route>
-      <Route path="/TOS" exact>
-        <TOS />
-      </Route>
-      <Route path="/" exact>
-        <Redirect to="/getStarted" />
-      </Route>
-      <Route path="/">
-        <Redirect to="/404" />
-      </Route>
-    </Switch>
-  </UserContextProvider>
+	<UserContextProvider>
+		<Switch>
+			<Route path="/getStarted" exact>
+				<LoginTemplate>
+					<Login />
+				</LoginTemplate>
+			</Route>
+			<Route path="/ID/:sessionId" render={() => <AppTemplate />}></Route>
+			<Route path="/404" exact>
+				<FourOhFour />
+			</Route>
+			<Route path="/TOS" exact>
+				<TOS />
+			</Route>
+			<Route path="/" exact>
+				<Redirect to="/getStarted" />
+			</Route>
+			<Route path="/">
+				<Redirect to="/404" />
+			</Route>
+		</Switch>
+	</UserContextProvider>
 );
 
 export default App;
