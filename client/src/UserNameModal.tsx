@@ -29,7 +29,6 @@ export const UserNameModal: React.FC<{ escape: () => void }> = ({ escape }) => {
 										currentUserName
 									)
 									.then((response) => {
-										console.log(`result of setting name: ${response}`);
 										if (response) {
 											context.setUserState("canVote");
 										}

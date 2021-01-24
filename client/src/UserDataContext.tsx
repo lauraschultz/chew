@@ -29,7 +29,6 @@ export const UserContextProvider: React.FC = ({ children }) => {
 
 	useEffect(() => {
 		if (userId) {
-			console.log(`setting localStorage`);
 			localStorage.setItem("chewUserId", userId);
 			setUserIdHash(md5(userId));
 		}
@@ -55,10 +54,7 @@ export const UserContextProvider: React.FC = ({ children }) => {
 			history.push(`/ID/${response.sessionId}`);
 			// history.
 			window.history.replaceState({ fromLogin: true }, "");
-			// console.log(`window.history.state: ${JSON.stringify(window.history.state)}`)
 		});
-		// history.push("/home");
-		// setSessionId(sessId)
 	};
 	return (
 		<Provider

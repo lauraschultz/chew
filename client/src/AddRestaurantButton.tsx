@@ -26,7 +26,7 @@ const AddRestaurantButton: React.FC<{
 					: "you must join the session before adding a restaurant"
 			}
 			data-balloon-pos="right"
-			className="py-1 px-2 mr-2 md:mr-4 text-gray-600 border-2 border-gray-300 rounded-full group btn-focus shadow"
+			className="py-1 px-2 mr-2 md:mr-4 text-gray-600 border-2 border-gray-300 rounded-full group btn-focus shadow bg-white"
 			onClick={() => {
 				if (!isRestaurantsAdded && userState === "canVote") {
 					setAdding(true);

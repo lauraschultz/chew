@@ -159,7 +159,7 @@ const Search: React.FC<{
 							setBusinesses(b);
 							setLoadingSearch(false);
 						})
-						.catch((e) => console.log(`oopsies ${e}`));
+						.catch((e) => console.error(`error searching: ${e}`));
 				}}
 			>
 				<div className="flex-1 inline-block">

@@ -51,7 +51,6 @@ const PlacesAutocomplete: React.FC<{
 			autoComplete.getPlacePredictions(
 				{ input: searchTerm, types: ["(regions)"] },
 				(result, status) => {
-					console.log("search results");
 					setCurrentSearchResults(result.map((r) => r.description) || []);
 				}
 			);
@@ -73,7 +72,6 @@ const PlacesAutocomplete: React.FC<{
 		(search: string) => {
 			selectPlace(search);
 			selectedText.current = search;
-			console.log(`selectedText.current is ${selectedText.current}`);
 		},
 		[selectPlace]
 	);

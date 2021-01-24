@@ -40,7 +40,7 @@ export class Socket {
 			axios
 				.post(`${SERVER}/setUserName/${sessionId}/${userId}/${userName}`)
 				.then((result) => resolve(result.data))
-				.catch(() => console.log(`error`))
+				.catch(() => console.error(`error setting username`))
 		);
 
 	addVote = (

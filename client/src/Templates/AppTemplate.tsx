@@ -77,11 +77,8 @@ const AppTemplate: React.FC = () => {
 	>({});
 	let history = useHistory();
 
-	useEffect(() => console.log(addedRestaurants), [addedRestaurants]);
-
 	useEffect(() => {
 		socket.subscribeToRestaurantAdded((newRestaurant: BusinessWithVotes) => {
-			console.log("recieving an added restaurant.");
 			setAddedRestaurants((r) => ({
 				...r,
 				[newRestaurant.business.id]: newRestaurant,
@@ -90,7 +87,6 @@ const AppTemplate: React.FC = () => {
 
 		socket.subscribeToRestaurantRemoved(
 			(response: { restaurantId: string }) => {
-				console.log("recieving an removed restaurant.");
 				setAddedRestaurants((r) => {
 					let clone = Object.assign({}, r);
 					delete clone[response.restaurantId];
@@ -106,22 +102,11 @@ const AppTemplate: React.FC = () => {
 
 		socket.subscribeToVoteAdded(
 			(params: { restaurantId: string; votes: string[] }) => {
-				setAddedRestaurants(
-					(r) => {
-						const updatedRestaurants = { ...r };
-						console.log(`vote added: ${params.votes.join(" | ")}`);
-						updatedRestaurants[params.restaurantId].votes = params.votes;
-						// console.log(r[params.restaurantId].votes);
-						return { ...r, ...updatedRestaurants };
-					}
-					// ({
-					// 	...r,
-					// 	[params.restaurantId]: {
-					// 		...r[params.restaurantId],
-					// 		votes: params.votes,
-					// 	},
-					// })
-				);
+				setAddedRestaurants((r) => {
+					const updatedRestaurants = { ...r };
+					updatedRestaurants[params.restaurantId].votes = params.votes;
+					return { ...r, ...updatedRestaurants };
+				});
 			}
 		);
 		return () => {
@@ -183,9 +168,6 @@ const AppTemplate: React.FC = () => {
 			window.history.replaceState({ fromLogin: false }, "");
 		} else if (sessionId !== "") {
 			socket.tryJoinSession({ sessionId, userId }, (response) => {
-				console.log(
-					`response from tryJoinSession is ${JSON.stringify(response)}`
-				);
 				if (response.success) {
 					setShowVotingToast(false);
 					setSessionId(sessionId);
@@ -200,7 +182,7 @@ const AppTemplate: React.FC = () => {
 					setLoaded(true);
 				} else {
 					history.push("/404");
-					console.log("recieved failure from server");
+					console.error("recieved failure from server");
 				}
 			});
 		}
