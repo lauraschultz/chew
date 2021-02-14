@@ -1,6 +1,5 @@
 import React from "react";
 import ModalWelcomeHeader from "./ModalWelcomeHeader";
-import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 import CopySessionUrl from "./CopySessionUrl";
 
 const ShareSessionModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
