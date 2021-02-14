@@ -52,7 +52,6 @@ export const UserContextProvider: React.FC = ({ children }) => {
 			setUserId(response.userId);
 			setUserState("canVote");
 			history.push(`/ID/${response.sessionId}`);
-			// history.
 			window.history.replaceState({ fromLogin: true }, "");
 		});
 	};

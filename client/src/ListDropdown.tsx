@@ -43,7 +43,7 @@ const ListDropdown: React.FC<{
 		return (
 			<ul
 				ref={ref}
-				className="absolute bg-white z-40 divide-y shadow text-sm rounded-b overflow-hidden"
+				className="absolute bg-gray-50 z-40 divide-y shadow text-sm rounded-b overflow-hidden"
 			>
 				{items.map((i, idx) => (
 					<li
@@ -51,7 +51,7 @@ const ListDropdown: React.FC<{
 						onMouseOver={(e) => setHoveredIdx(idx)}
 						className={
 							"px-2 py-1 cursor-pointer " +
-							(hoveredIdx === idx ? "bg-blue-light2 text-white" : "")
+							(hoveredIdx === idx ? "bg-blue-light2 text-gray-50" : "")
 						}
 						onClick={() => {
 							updateSelection(i);

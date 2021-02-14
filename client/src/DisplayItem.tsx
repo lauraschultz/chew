@@ -24,7 +24,6 @@ export const DisplayItem: React.FC<{
 	sessionId?: string;
 }> = ({ restaurant, addRestaurant, vote, userIdHash, userId, sessionId }) => {
 	let [expanded, setExpanded] = useState(false);
-	// let {userState} = useContext(UserContext);
 	return (
 		<div className="p-1 lg:p-2 my-1 max-w-md mx-auto">
 			{restaurant.addedBy && (
@@ -35,6 +34,7 @@ export const DisplayItem: React.FC<{
 						: restaurant.addedBy.name}
 					{userIdHash === restaurant.addedBy.hashId && (
 						<button
+							aria-label={`remove ${restaurant.business.name}`}
 							onClick={() =>
 								socket.removeRestaurant(
 									sessionId || "",
@@ -42,7 +42,7 @@ export const DisplayItem: React.FC<{
 									restaurant.business.id
 								)
 							}
-							className="mx-1 px-2 py-0.5 border border-gray-300 rounded bg-white hover:bg-red hover:text-white hover:border-red hover:shadow btn-focus transition-all duration-200"
+							className="mx-1 px-2 py-0.5 border border-gray-300 rounded bg-gray-50 hover:bg-red hover:text-gray-50 hover:border-red hover:shadow btn-focus transition-all duration-200"
 						>
 							<FontAwesomeIcon icon={faTrash} className="mr-1" />
 							remove
@@ -56,7 +56,7 @@ export const DisplayItem: React.FC<{
 					<h2 className="flex-1 leading-tight font-display italic font-bold text-xl text-gray-800">
 						{restaurant.business.name}
 						{restaurant.business.price && (
-							<span className="ml-2 px-1 pt-1 rounded bg-gray-500 text-white text-sm whitespace-nowrap">
+							<span className="ml-2 px-1 pt-1 rounded bg-gray-500 text-gray-50 text-sm whitespace-nowrap">
 								{restaurant.business.price.split("").map((_, i) => (
 									<FontAwesomeIcon icon={faDollarSign} key={i} />
 								))}
@@ -77,8 +77,9 @@ export const DisplayItem: React.FC<{
 				<button
 					className="flex-initial fa-layers fa-fw fa-2x ml-2 right-0 btn-focus rounded-full"
 					onClick={() => setExpanded((prev) => !prev)}
+					aria-label={expanded ? "hide more info" : "show more info"}
 				>
-					<FontAwesomeIcon className=" text-white" icon={faCircle} />
+					<FontAwesomeIcon className=" text-gray-50" icon={faCircle} />
 					<FontAwesomeIcon
 						className=" text-yellow"
 						icon={expanded ? faChevronCircleUp : faChevronCircleDown}
@@ -91,8 +92,8 @@ export const DisplayItem: React.FC<{
 					<div className="my-1">
 						{restaurant.votes.map((v, idx) =>
 							v ? (
-								<span className="m-1 border-gray-800 rounded-sm border bg-white shadow-md">
-									<span className="bg-gray-800 text-white px-1">
+								<span className="m-1 border-gray-800 rounded-sm border bg-gray-50 shadow-md whitespace-nowrap">
+									<span className="bg-gray-800 text-gray-50 px-1">
 										<FontAwesomeIcon icon={icons[idx].icon} />
 									</span>
 									<span className="px-2 text-gray-800">{v}</span>
@@ -145,7 +146,7 @@ export const DisplayItem: React.FC<{
 									)}
 
 								<a
-									className="block text-center rounded w-full py-1 px-3 bg-red text-white font-bold italic mt-3"
+									className="block text-center rounded w-full py-1 px-3 bg-red text-gray-50 font-bold italic mt-3"
 									href={restaurant.business.url}
 									target="_blank"
 									rel="noopener noreferrer"

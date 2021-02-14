@@ -24,12 +24,11 @@ const Vote: React.FC<{
 				<button
 					key={idx}
 					className="p-xs m-xs btn-focus rounded-full"
-					// className={"fa-layers fa-fw fa-2x m-1"}
 					onClick={() => addVote(idx)}
 					aria-label={i.descText}
 					data-balloon-pos="down"
 				>
-					<div className="leading-none bg-white rounded-full">
+					<div className="leading-none bg-gray-50 rounded-full">
 						<FontAwesomeIcon className={i.color} icon={i.icon} size="2x" />
 					</div>
 					<div className={currentVote === idx ? "" : "hidden"}>
@@ -50,12 +49,6 @@ const Vote: React.FC<{
 							alt=""
 						/>
 					</div>
-
-					{/* <FontAwesomeIcon
-            className="text-white"
-              icon={faCircle}
-              // size="2x"
-            /> */}
 				</button>
 			))}
 		</form>

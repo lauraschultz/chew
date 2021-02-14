@@ -17,7 +17,6 @@ const AddRestaurantButton: React.FC<{
 	let [adding, setAdding] = useState(false);
 	return (
 		<button
-			// title={displayVoteComponent[b.id] ? "you have already added" : "add this restaurant"}
 			aria-label={
 				isRestaurantsAdded
 					? "restaurant has already been added"
@@ -26,7 +25,7 @@ const AddRestaurantButton: React.FC<{
 					: "you must join the session before adding a restaurant"
 			}
 			data-balloon-pos="right"
-			className="py-1 px-2 mr-2 md:mr-4 text-gray-600 border-2 border-gray-300 rounded-full group btn-focus shadow bg-white"
+			className="py-1 px-2 mr-2 md:mr-4 text-gray-600 border border-gray-300 rounded-full group btn-focus shadow bg-gray-50"
 			onClick={() => {
 				if (!isRestaurantsAdded && userState === "canVote") {
 					setAdding(true);
@@ -40,9 +39,6 @@ const AddRestaurantButton: React.FC<{
 				className={adding ? "animate-spin" : ""}
 				icon={adding ? faCircleNotch : isRestaurantsAdded ? faCheck : faPlus}
 			/>
-			{/* <span className="hidden hover:block absolute">
-    <Tooltip>{displayVoteComponent[b.id] ? <p>you have already added</p> : <p>add this restaurant</p>}</Tooltip>
-  </span> */}
 		</button>
 	);
 };

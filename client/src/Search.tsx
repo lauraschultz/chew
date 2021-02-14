@@ -165,7 +165,8 @@ const Search: React.FC<{
 				<div className="flex-1 inline-block">
 					<input
 						className="rounded-l py-1 px-2 shadow btn-focus w-full border-y border-l border-gray-300 focus:border-gray-300"
-						type="text"
+						type="search"
+						inputMode="search"
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
 					/>
@@ -177,8 +178,9 @@ const Search: React.FC<{
 					/>
 				</div>
 				<button
-					className="shadow py-1 px-2 text-white bg-blue rounded-r btn-focus flex-initial"
+					className="shadow py-1 px-2 text-gray-50 bg-blue rounded-r btn-focus flex-initial"
 					type="submit"
+					aria-label="search"
 				>
 					<FontAwesomeIcon aria-label="search" icon={faSearch} />
 				</button>

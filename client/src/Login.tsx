@@ -39,7 +39,7 @@ const Login: React.FC = () => {
 								<div className="py-1 px-2 rounded border border-gray-300 bg-white focus-within:border-blue-light2 w-max-content">
 									<FontAwesomeIcon icon={faUser} className="mr-2" />
 									<input
-										className="px-2 focus:ring-0 border-0 border-l border-gray-300 focus:border-gray-300 py-0"
+										className="px-2 focus:ring-0 border-0 border-l border-gray-300 bg-white focus:border-gray-300 py-0"
 										type="text"
 										value={userName}
 										onChange={(e) => setUserName(e.target.value)}
@@ -56,7 +56,7 @@ const Login: React.FC = () => {
 								>
 									<FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
 									<input
-										className="px-2 focus:ring-0 border-0 border-l border-gray-300 focus:border-gray-300 py-0"
+										className="px-2 focus:ring-0 border-0 border-l border-gray-300 bg-white focus:border-gray-300 py-0"
 										type="text"
 										value={location}
 										onChange={(e) => setLocation(e.target.value)}
@@ -79,10 +79,11 @@ const Login: React.FC = () => {
 									serves as a starting point for your search.
 								</p>
 							</div>
-							<div className="relative overflow-hidden group text-white">
+							<div className="relative overflow-hidden group text-gray-50">
 								<button
 									type="submit"
 									className="block w-full p-2 uppercase font-bold tracking-wide bg-yellow hover:bg-yellow-dark rounded shadow btn-focus"
+									aria-label="create new session"
 								>
 									create
 								</button>{" "}
@@ -117,7 +118,7 @@ const Login: React.FC = () => {
 						</form>
 					)}
 				</UserContextConsumer>
-				<div className="p-4 border-l-8 border-gray-200 bg-white bg-opacity-25 mx-4 md:my-4 md:mx-8 rounded shadow leading-tight">
+				<div className="p-4 border-l-8 border-gray-200 bg-gray-50 bg-opacity-25 mx-4 md:my-4 md:mx-8 rounded shadow leading-tight">
 					If you are trying to join someone else's session, copy and paste the
 					session link to your browser.
 				</div>

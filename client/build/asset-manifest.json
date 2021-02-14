@@ -1,27 +1,29 @@
 {
   "files": {
-    "main.css": "/chew/static/css/main.c4470dc1.chunk.css",
-    "main.js": "/chew/static/js/main.06c90b3b.chunk.js",
-    "main.js.map": "/chew/static/js/main.06c90b3b.chunk.js.map",
-    "runtime-main.js": "/chew/static/js/runtime-main.dc57f4cc.js",
-    "runtime-main.js.map": "/chew/static/js/runtime-main.dc57f4cc.js.map",
-    "static/js/2.5e7a96c6.chunk.js": "/chew/static/js/2.5e7a96c6.chunk.js",
-    "static/js/2.5e7a96c6.chunk.js.map": "/chew/static/js/2.5e7a96c6.chunk.js.map",
+    "main.css": "/chew/static/css/main.510a3023.chunk.css",
+    "main.js": "/chew/static/js/main.5a1e4f89.chunk.js",
+    "main.js.map": "/chew/static/js/main.5a1e4f89.chunk.js.map",
+    "runtime-main.js": "/chew/static/js/runtime-main.9026eb27.js",
+    "runtime-main.js.map": "/chew/static/js/runtime-main.9026eb27.js.map",
+    "static/js/2.d5937b56.chunk.js": "/chew/static/js/2.d5937b56.chunk.js",
+    "static/js/2.d5937b56.chunk.js.map": "/chew/static/js/2.d5937b56.chunk.js.map",
+    "static/js/3.8cf7669a.chunk.js": "/chew/static/js/3.8cf7669a.chunk.js",
+    "static/js/3.8cf7669a.chunk.js.map": "/chew/static/js/3.8cf7669a.chunk.js.map",
     "index.html": "/chew/index.html",
-    "static/css/main.c4470dc1.chunk.css.map": "/chew/static/css/main.c4470dc1.chunk.css.map",
-    "static/js/2.5e7a96c6.chunk.js.LICENSE.txt": "/chew/static/js/2.5e7a96c6.chunk.js.LICENSE.txt",
-    "static/media/chew_logo.b2611f50.svg": "/chew/static/media/chew_logo.b2611f50.svg",
+    "static/css/main.510a3023.chunk.css.map": "/chew/static/css/main.510a3023.chunk.css.map",
+    "static/js/2.d5937b56.chunk.js.LICENSE.txt": "/chew/static/js/2.d5937b56.chunk.js.LICENSE.txt",
+    "static/media/chew_logo.svg": "/chew/static/media/chew_logo.b2611f50.svg",
     "static/media/corner.50f00bff.svg": "/chew/static/media/corner.50f00bff.svg",
     "static/media/ice_cream_girl.d05f0f17.svg": "/chew/static/media/ice_cream_girl.d05f0f17.svg",
     "static/media/papers.4c78aba3.svg": "/chew/static/media/papers.4c78aba3.svg",
     "static/media/reading_girl.3d7737b0.svg": "/chew/static/media/reading_girl.3d7737b0.svg",
     "static/media/triangles.de4adca4.svg": "/chew/static/media/triangles.de4adca4.svg",
-    "static/media/waves.fbbb5cf9.svg": "/chew/static/media/waves.fbbb5cf9.svg"
+    "static/media/waves.44ab1c06.svg": "/chew/static/media/waves.44ab1c06.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.dc57f4cc.js",
-    "static/js/2.5e7a96c6.chunk.js",
-    "static/css/main.c4470dc1.chunk.css",
-    "static/js/main.06c90b3b.chunk.js"
+    "static/js/runtime-main.9026eb27.js",
+    "static/js/2.d5937b56.chunk.js",
+    "static/css/main.510a3023.chunk.css",
+    "static/js/main.5a1e4f89.chunk.js"
   ]
 }

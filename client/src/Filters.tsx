@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useReducer, useState } from "react";
 import { FilterResults } from "./Search";
 import { FilterForm, SearchFormState } from "./Templates/AppTemplate";
+import { useClickOutsideListenerRef } from "./useClickOutsideListenerRef";
 
 const Filters: React.FC<{
 	update: (newFilters: FilterResults) => void;
@@ -23,22 +24,19 @@ const Filters: React.FC<{
 		},
 	};
 	let [showFilters, setShowFilters] = useState(false);
-	// let location = useLocation();
-	// let history = useHistory()
 	const [state, dispatch] = useReducer(
 		formReducer,
 		searchFormFilterState || initialForm
 	);
-	//   let [[price1, price2], setPrices] = useState<(number | undefined)[]>([0, 3]);
-	// let onlyOnePriceSet: boolean;
+	let ref = useClickOutsideListenerRef(() => {
+		if (showFilters) {
+			setShowFilters(false);
+		}
+	});
 
 	useEffect(() => {
 		updateSearchFormState({ filter: state });
 	}, [state, updateSearchFormState]);
-
-	// useEffect(() => {
-	//   onlyOnePriceSet = !(state.prices[0]! > -1 && state.prices[1]! > -1);
-	// }, [state.prices]);
 
 	const min = (arr: (number | undefined)[]) => {
 		let min = 99;
@@ -75,21 +73,27 @@ const Filters: React.FC<{
 		}
 		return (stops[0] < n && n < stops[1]) || (stops[1] < n && n < stops[0]);
 	};
-	const priceArray = new Array(4).fill("").map((a, b) => "$".repeat(b + 1));
+	const priceArray = new Array(4).fill("").map((_, b) => "$".repeat(b + 1));
 
 	return (
 		<>
 			<button
 				type="button"
-				className="ml-1 px-2 py-1 text-blueGray border border-blue bg-white rounded shadow font-bold text-sm uppercase tracking-wide btn-focus flex-inital whitespace-nowrap"
-				onClick={() => setShowFilters(!showFilters)}
+				className="ml-1 px-2 py-1 text-blue border border-blue bg-gray-50 rounded shadow font-bold text-sm uppercase tracking-wide btn-focus flex-inital whitespace-nowrap"
+				onClick={() => {
+					if (!showFilters) {
+						setShowFilters(true);
+					}
+				}}
+				aria-label="show filters"
 			>
 				<FontAwesomeIcon icon={faSlidersH} className="mr-2" />
 				filters
 			</button>
 			<div
+				ref={ref}
 				className={
-					"p-2 mt-10 mx-2 absolute border border-gray-300 rounded bg-white z-40 left-0 right-0 " +
+					"p-2 mt-10 mx-2 absolute border border-gray-300 rounded bg-gray-50 z-40 left-0 right-0 " +
 					(showFilters ? "" : "hidden")
 				}
 			>
@@ -107,12 +111,13 @@ const Filters: React.FC<{
 								className={
 									"relative px-2 btn-focus " +
 									(state.prices.includes(idx)
-										? "bg-blueGray text-white px-1 py-2 rounded-full z-30 "
+										? "bg-blue text-gray-50 px-1 py-2 rounded-full z-30 "
 										: "") +
 									(isBetween(idx, state.prices)
 										? "bg-blueGray-light text-gray-800 py-1 px-4 -mx-2 z-20 "
 										: "")
 								}
+								aria-label={`price: ${d}`}
 							>
 								{d}
 							</button>
@@ -123,7 +128,7 @@ const Filters: React.FC<{
 					</span>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus rounded-full text-blueGray"
+							className="mr-1 btn-focus rounded-full text-blue"
 							checked={state.openDate === "any"}
 							type="radio"
 							name="day"
@@ -133,7 +138,7 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus rounded-full  text-blueGray"
+							className="mr-1 btn-focus rounded-full  text-blue"
 							checked={state.openDate === "today"}
 							type="radio"
 							name="day"
@@ -142,7 +147,7 @@ const Filters: React.FC<{
 						Today
 						<label className="block px-4 -mt-1 mb-2 ">
 							<input
-								className="mr-1 btn-focus rounded text-blueGray"
+								className="mr-1 btn-focus rounded text-blue"
 								checked={state.openNow}
 								type="checkbox"
 								onChange={() => dispatch({ key: "openNow" })}
@@ -157,7 +162,7 @@ const Filters: React.FC<{
 					</span>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus  rounded text-blueGray"
+							className="mr-1 btn-focus  rounded text-blue"
 							checked={state.services.pickup}
 							type="checkbox"
 							onChange={() => dispatch({ key: "pickup" })}
@@ -166,7 +171,7 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus  rounded text-blueGray"
+							className="mr-1 btn-focus  rounded text-blue"
 							checked={state.services.delivery}
 							type="checkbox"
 							onChange={() => dispatch({ key: "delivery" })}
@@ -175,7 +180,7 @@ const Filters: React.FC<{
 					</label>
 					<label className="block px-2">
 						<input
-							className="mr-1 btn-focus  rounded text-blueGray"
+							className="mr-1 btn-focus  rounded text-blue"
 							checked={state.services.restaurant_reservation}
 							type="checkbox"
 							onChange={() => dispatch({ key: "restaurant_reservation" })}
@@ -189,7 +194,7 @@ const Filters: React.FC<{
 								state.services.delivery ||
 								state.services.restaurant_reservation
 							)
-								? "mx-6 my-1 bg-white bg-opacity-50 border-l-4 border-orange-500 px-2 py-1 rounded text-sm italic"
+								? "mx-6 my-1 bg-gray-50 bg-opacity-50 border-l-4 border-orange-500 px-2 py-1 rounded text-sm italic"
 								: "hidden"
 						}
 					>
@@ -243,10 +248,6 @@ function formReducer(
 	}
 	const newState = { ...prevState, ...stateUpdates };
 
-	// window.history.replaceState({
-	//   ...window.history.state,
-	//   filter: JSON.stringify(newState)
-	// }, "")
 	return newState;
 }
 

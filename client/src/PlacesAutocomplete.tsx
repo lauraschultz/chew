@@ -36,16 +36,11 @@ const PlacesAutocomplete: React.FC<{
 		);
 	}, []);
 
-	// if(Math.abs(searchTerm.length - currentSearchTerm.length)<2){
-	//     setCurrentSearchTerm(searchTerm);
-	// }
-
 	useEffect(() => {
 		if (
 			scriptLoaded &&
 			searchTerm &&
 			searchTerm !== currentSearchTerm.current
-			// Math.abs(searchTerm.length - currentSearchTerm.current.length) > 1
 		) {
 			currentSearchTerm.current = searchTerm;
 			autoComplete.getPlacePredictions(
@@ -55,18 +50,7 @@ const PlacesAutocomplete: React.FC<{
 				}
 			);
 		}
-		// selectedText.current = undefined;
 	}, [searchTerm]);
-
-	// const select = (selectedItem: string) => {
-	// 	selectedText.current = selectedItem;
-	// 	selectPlace(selectedItem);
-	// 	// setCurrentSearchResults([])
-	// };
-
-	// if (selectedText.current === searchTerm) {
-	// 	return <ul ref={ref} />;
-	// }
 
 	const updateSelection = useCallback(
 		(search: string) => {

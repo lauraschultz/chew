@@ -7,7 +7,7 @@ import { faHome } from "@fortawesome/free-solid-svg-icons";
 
 const FourOhFour: React.FC = () => (
 	<LoginTemplate>
-		<div className="flex-1 py-2 px-4 md:py-4 md:px-6 bg-white text-gray-800 rounded-lg shadow-lg max-w-md m-2 lg:mr-6">
+		<div className="flex-1 py-2 px-4 md:py-4 md:px-6 bg-gray-50 text-gray-800 rounded-lg shadow-lg max-w-md m-2 lg:mr-6">
 			<h2 className="text-xl font-display font-bold italic">Page not found</h2>
 			<p className="leading-tight mt-1">
 				If you are trying to join someone's session, please make sure you have
@@ -15,7 +15,7 @@ const FourOhFour: React.FC = () => (
 			</p>
 			<Link
 				to="/getStarted"
-				className="inline-block shadow rounded bg-red py-1 px-2 text-sm text-white uppercase tracking-wide mt-3"
+				className="inline-block shadow rounded bg-red py-1 px-2 text-sm text-gray-50 uppercase tracking-wide mt-3"
 			>
 				<FontAwesomeIcon icon={faHome} className="mr-2" />
 				Go home

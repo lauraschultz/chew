@@ -3,12 +3,10 @@ import { BusinessWithVotes } from "../../shared/types";
 import Vote from "./Vote";
 import DisplayItem from "./DisplayItem";
 import { UserContext } from "./UserDataContext";
-// import { matchPath, RouteComponentProps, useParams } from "react-router-dom";
 
 const Display: React.FC<{
 	voteOnRestaurant: Function;
 	addedRestaurants: { [id: string]: BusinessWithVotes };
-	// previousVotes: {[restaurantId:string]: number}
 }> = ({ voteOnRestaurant, addedRestaurants }) => {
 	let {
 		previousVotes,
